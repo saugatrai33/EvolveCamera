@@ -8,17 +8,17 @@ Initial release
 ## Install with Gradle
 
 allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
 	}
+}
   
   dependencies {
-	        implementation 'com.github.saugatrai33:EvolveCameraX:$latest_version'
-	}
+	implementation 'com.github.saugatrai33:EvolveCameraX:$latest_version'
+}
   
-  class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var image: ImageView
 
