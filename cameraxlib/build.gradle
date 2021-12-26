@@ -86,11 +86,15 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.4.0")
 }
 
-project.afterEvaluate {
+afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
                 from components.release
+
+                groupId = 'com.github.saugatrai33'
+                artifactId = 'evolve-camerax'
+                version = '1.0.9'
             }
         }
     }

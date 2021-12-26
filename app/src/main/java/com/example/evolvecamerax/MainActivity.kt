@@ -9,6 +9,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.example.cameraxlib.EvolveImagePicker
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         image = findViewById(R.id.image)
-        /*EvolveImagePicker.with(this)
-            .start(evolveActivityResultLauncher)*/
+        EvolveImagePicker.with(this)
+            .start(evolveActivityResultLauncher)
     }
 }
