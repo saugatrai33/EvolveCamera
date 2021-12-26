@@ -8,24 +8,24 @@ Initial release
 ## Install with Gradle
 
 Project level build.gradle.
-'''
+```
 allprojects {
 	repositories {
 		...
 		maven { url 'https://jitpack.io' }
 	}
 }
-'''
+```
   
 In you build.gradle app level.
-'''
+```
 dependencies {
 	implementation 'com.github.saugatrai33:EvolveCameraX:$latest_version'
 }
-'''
+```
   
 Then in you activity.
-'''
+```
 class MainActivity : AppCompatActivity() {
 
     private lateinit var image: ImageView
@@ -50,5 +50,5 @@ class MainActivity : AppCompatActivity() {
             .start(evolveActivityResultLauncher)
     }
 }
-'''
+```
   
