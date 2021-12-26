@@ -3,7 +3,6 @@ plugins {
     id 'kotlin-android'
     id 'androidx.navigation.safeargs'
     id 'kotlin-kapt'
-    id 'org.jlleitschuh.gradle.ktlint'
     id 'maven-publish'
 }
 
