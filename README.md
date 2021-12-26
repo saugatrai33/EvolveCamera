@@ -6,16 +6,6 @@ Initial release
 
 
 ## Install with Gradle
-
-Project level build.gradle.
-```
-allprojects {
-	repositories {
-		...
-		maven { url 'https://jitpack.io' }
-	}
-}
-```
   
 In you build.gradle app level.
 ```
