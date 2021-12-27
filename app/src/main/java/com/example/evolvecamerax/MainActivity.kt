@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity() {
             Log.d("MainActivity::", "result: ${data.toString()}")
             Glide.with(this)
                 .load(data)
-                .apply(RequestOptions.centerCropTransform())
                 .into(image)
         }
 

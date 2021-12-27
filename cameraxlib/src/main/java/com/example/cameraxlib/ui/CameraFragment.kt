@@ -7,9 +7,7 @@ import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -36,7 +34,6 @@ import java.util.concurrent.Executors
  * Main fragment for this app. Implements all camera operations including:
  * - Viewfinder
  * - Photo taking
- * - Image analysis
  */
 class CameraFragment : Fragment() {
 
@@ -54,6 +51,8 @@ class CameraFragment : Fragment() {
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var windowManager: WindowManager
+    private lateinit var cameraControl: CameraControl
+    private lateinit var cameraInfo: CameraInfo
 
     private val displayManager by lazy {
         requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
@@ -78,6 +77,24 @@ class CameraFragment : Fragment() {
         } ?: Unit
     }
 
+    // Listen to pinch gestures
+    private val listener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
+            // Get the camera's current zoom ratio
+            val currentZoomRatio = cameraInfo.zoomState.value?.zoomRatio ?: 0F
+
+            // Get the pinch gesture's scaling factor
+            val delta = detector.scaleFactor
+
+            // Update the camera's zoom ratio. This is an asynchronous operation that returns
+            // a ListenableFuture, allowing you to listen to when the operation completes.
+            cameraControl.setZoomRatio(currentZoomRatio * delta)
+
+            // Return true, as the event was handled
+            return true
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -100,6 +117,7 @@ class CameraFragment : Fragment() {
 
     override fun onDestroyView() {
         binding = null
+        cameraUiContainerBinding = null
         super.onDestroyView()
 
         // Shut down our background executor
@@ -109,7 +127,7 @@ class CameraFragment : Fragment() {
         displayManager.unregisterDisplayListener(displayListener)
     }
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission", "ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -121,6 +139,9 @@ class CameraFragment : Fragment() {
 
         //Initialize WindowManager to retrieve display metrics
         windowManager = WindowManager(view.context)
+
+        // Gesture Detector
+        val scaleGestureDetector = ScaleGestureDetector(requireActivity(), listener)
 
         // Determine the output directory
         outputDirectory = getOutputDirectory(requireContext())
@@ -137,6 +158,32 @@ class CameraFragment : Fragment() {
             // Set up the camera and its use cases
             setUpCamera()
         }
+
+        // Listen to tap events on the viewfinder and set them as focus regions
+        binding!!.viewFinder.setOnTouchListener { _: View, motionEvent: MotionEvent ->
+            scaleGestureDetector.onTouchEvent(motionEvent)
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> return@setOnTouchListener true
+                MotionEvent.ACTION_UP -> {
+                    // Get the MeteringPointFactory from PreviewView
+                    val factory = binding!!.viewFinder.meteringPointFactory
+
+                    // Create a MeteringPoint from the tap coordinates
+                    val point = factory.createPoint(motionEvent.x, motionEvent.y)
+
+                    // Create a MeteringAction from the MeteringPoint, you can configure it to specify the metering mode
+                    val action = FocusMeteringAction.Builder(point).build()
+
+                    // Trigger the focus and metering. The method returns a ListenableFuture since the operation
+                    // is asynchronous. You can use it get notified when the focus is successful or if it fails.
+                    camera!!.cameraControl.startFocusAndMetering(action)
+
+                    return@setOnTouchListener true
+                }
+                else -> return@setOnTouchListener false
+            }
+        }
+
     }
 
     /**
@@ -227,6 +274,9 @@ class CameraFragment : Fragment() {
             camera = cameraProvider.bindToLifecycle(
                 this, cameraSelector, preview, imageCapture
             )
+
+            cameraControl = camera!!.cameraControl
+            cameraInfo = camera!!.cameraInfo
 
             // Attach the viewfinder's surface provider to preview use case
             preview?.setSurfaceProvider(binding!!.viewFinder.surfaceProvider)
