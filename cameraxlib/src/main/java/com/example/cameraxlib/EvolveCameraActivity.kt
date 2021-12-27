@@ -48,11 +48,6 @@ class EvolveCameraActivity : AppCompatActivity(),
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        finishAfterTransition()
-    }
-
     private fun hideSystemUI() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, binding.fragmentContainer).let { controller ->

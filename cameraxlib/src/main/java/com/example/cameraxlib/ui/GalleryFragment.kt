@@ -80,7 +80,6 @@ class GalleryFragment internal constructor() : Fragment() {
 
         Glide.with(requireActivity())
             .load(imgUri)
-            .apply(RequestOptions.centerCropTransform())
             .into(fragmentGalleryBinding.picture)
     }
 
