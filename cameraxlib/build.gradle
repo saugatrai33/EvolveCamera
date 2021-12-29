@@ -80,8 +80,8 @@ dependencies {
     //WindowManager
     implementation 'androidx.window:window:1.0.0-alpha09'
 
-    // Fresco
-    implementation 'com.facebook.fresco:fresco:2.6.0'
+    // Picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
     // UI ktx
     implementation("androidx.activity:activity-ktx:1.4.0")

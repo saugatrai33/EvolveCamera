@@ -16,9 +16,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.cameraxlib.R
 import com.example.cameraxlib.databinding.FragmentGalleryBinding
 import com.example.cameraxlib.utils.padWithDisplayCutout
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.imagepipeline.common.RotationOptions
-import com.facebook.imagepipeline.request.ImageRequestBuilder
+import com.squareup.picasso.Picasso
 
 /** Fragment used to present the user with a gallery of photo taken */
 class GalleryFragment internal constructor() : Fragment() {
@@ -87,15 +85,9 @@ class GalleryFragment internal constructor() : Fragment() {
     }
 
     private fun showImg() {
-        val imageRequest = ImageRequestBuilder.newBuilderWithSource(imgUri)
-            .setRotationOptions(RotationOptions.autoRotate())
-            .build()
-
-        fragmentGalleryBinding.picture.controller = Fresco.newDraweeControllerBuilder()
-            .setImageRequest(imageRequest)
-            .build()
-
-        fragmentGalleryBinding.picture.setImageURI(imgUri)
+        Picasso.get()
+            .load(imgUri)
+            .into(fragmentGalleryBinding.picture)
     }
 
     override fun onDestroyView() {

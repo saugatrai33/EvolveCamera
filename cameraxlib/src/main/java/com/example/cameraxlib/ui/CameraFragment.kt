@@ -53,31 +53,10 @@ class CameraFragment : Fragment() {
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var windowManager: WindowManager
-    private lateinit var cameraControl: CameraControl
-    private lateinit var cameraInfo: CameraInfo
     private var rotationDegree: Int = 0
-
-    private val displayManager by lazy {
-        requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-    }
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
-
-    /**
-     * We need a display listener for orientation changes that do not trigger a configuration
-     * change, for example if we choose to override config change in manifest or for 180-degree
-     * orientation changes.
-     */
-    private val displayListener = object : DisplayManager.DisplayListener {
-        override fun onDisplayAdded(displayId: Int) = Unit
-        override fun onDisplayRemoved(displayId: Int) = Unit
-        override fun onDisplayChanged(displayId: Int) = view?.let { view ->
-            if (displayId == this@CameraFragment.displayId) {
-                Log.d(TAG, "Rotation changed: ${view.display.rotation}")
-            }
-        } ?: Unit
-    }
 
     private val orientationEventListener by lazy {
         object : OrientationEventListener(requireContext()) {
@@ -97,26 +76,7 @@ class CameraFragment : Fragment() {
                     else -> Surface.ROTATION_0
                 }
                 imageCapture?.targetRotation = rotation
-//                preview?.targetRotation = rotation
             }
-        }
-    }
-
-    // Listen to pinch gestures
-    private val listener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-        override fun onScale(detector: ScaleGestureDetector): Boolean {
-            // Get the camera's current zoom ratio
-            val currentZoomRatio = cameraInfo.zoomState.value?.zoomRatio ?: 0F
-
-            // Get the pinch gesture's scaling factor
-            val delta = detector.scaleFactor
-
-            // Update the camera's zoom ratio. This is an asynchronous operation that returns
-            // a ListenableFuture, allowing you to listen to when the operation completes.
-            cameraControl.setZoomRatio(currentZoomRatio * delta)
-
-            // Return true, as the event was handled
-            return true
         }
     }
 
@@ -152,7 +112,6 @@ class CameraFragment : Fragment() {
         cameraExecutor.shutdown()
 
         // Unregister the listeners
-        displayManager.unregisterDisplayListener(displayListener)
         orientationEventListener.disable()
     }
 
@@ -164,13 +123,9 @@ class CameraFragment : Fragment() {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         // Every time the orientation of device changes, update rotation for use cases
-        displayManager.registerDisplayListener(displayListener, null)
 
         //Initialize WindowManager to retrieve display metrics
         windowManager = WindowManager(view.context)
-
-        // Gesture Detector
-        val scaleGestureDetector = ScaleGestureDetector(requireActivity(), listener)
 
         // Determine the output directory
         outputDirectory = getOutputDirectory(requireContext())
@@ -190,7 +145,6 @@ class CameraFragment : Fragment() {
 
         // Listen to tap events on the viewfinder and set them as focus regions
         binding!!.viewFinder.setOnTouchListener { _: View, motionEvent: MotionEvent ->
-            scaleGestureDetector.onTouchEvent(motionEvent)
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> return@setOnTouchListener true
                 MotionEvent.ACTION_UP -> {
@@ -213,6 +167,24 @@ class CameraFragment : Fragment() {
             }
         }
 
+    }
+
+    /**
+     * Inflate camera controls and update the UI manually upon config changes to avoid removing
+     * and re-adding the view finder from the view hierarchy; this provides a seamless rotation
+     * transition on devices that support it.
+     *
+     * NOTE: The flag is supported starting in Android 8 but there still is a small flash on the
+     * screen for devices that run Android 9 or below.
+     */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        // Rebind the camera with the updated display metrics
+        bindCameraUseCases()
+
+        // Enable or disable switching between cameras
+        updateCameraSwitchButton()
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
@@ -285,9 +257,6 @@ class CameraFragment : Fragment() {
             camera = cameraProvider.bindToLifecycle(
                 this, cameraSelector, preview, imageCapture
             )
-
-            cameraControl = camera!!.cameraControl
-            cameraInfo = camera!!.cameraInfo
 
             // Attach the viewfinder's surface provider to preview use case
             preview?.setSurfaceProvider(binding!!.viewFinder.surfaceProvider)
@@ -437,13 +406,13 @@ class CameraFragment : Fragment() {
                             val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
                             Log.d(TAG, "Photo capture succeeded: $savedUri")
 
-                            val intent = Intent()
+/*                            val intent = Intent()
                             intent.data = savedUri
                             intent.putExtra("rotation", rotationDegree)
                             requireActivity().setResult(Activity.RESULT_OK, intent)
-                            requireActivity().finish()
+                            requireActivity().finish()*/
 
-                            /*lifecycleScope.launch(Dispatchers.Main) {
+                            lifecycleScope.launch(Dispatchers.Main) {
                                 Navigation.findNavController(
                                     requireActivity(),
                                     R.id.fragment_container
@@ -451,7 +420,7 @@ class CameraFragment : Fragment() {
                                     CameraFragmentDirections
                                         .actionCameraFragmentToGalleryFragment(savedUri.toString())
                                 )
-                            }*/
+                            }
                         }
                     })
             }

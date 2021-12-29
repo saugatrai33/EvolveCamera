@@ -10,7 +10,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.cameraxlib.databinding.ActivityEvolveCameraBinding
-import com.facebook.drawee.backends.pipeline.Fresco
 
 private const val IMMERSIVE_FLAG_TIMEOUT = 500L
 
@@ -21,7 +20,6 @@ class EvolveCameraActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Fresco.initialize(this)
         binding = ActivityEvolveCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
