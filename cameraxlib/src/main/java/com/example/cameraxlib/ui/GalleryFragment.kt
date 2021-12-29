@@ -2,6 +2,7 @@ package com.example.cameraxlib.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -9,16 +10,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.example.cameraxlib.R
 import com.example.cameraxlib.databinding.FragmentGalleryBinding
 import com.example.cameraxlib.utils.padWithDisplayCutout
-import com.example.cameraxlib.utils.showImmersive
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.imagepipeline.common.RotationOptions
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 
 /** Fragment used to present the user with a gallery of photo taken */
 class GalleryFragment internal constructor() : Fragment() {
@@ -77,10 +77,25 @@ class GalleryFragment internal constructor() : Fragment() {
             requireActivity().setResult(Activity.RESULT_OK, intent)
             requireActivity().finish()
         }
+        showImg()
+    }
 
-        Glide.with(requireActivity())
-            .load(imgUri)
-            .into(fragmentGalleryBinding.picture)
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Checks the orientation of the screen
+        showImg()
+    }
+
+    private fun showImg() {
+        val imageRequest = ImageRequestBuilder.newBuilderWithSource(imgUri)
+            .setRotationOptions(RotationOptions.autoRotate())
+            .build()
+
+        fragmentGalleryBinding.picture.controller = Fresco.newDraweeControllerBuilder()
+            .setImageRequest(imageRequest)
+            .build()
+
+        fragmentGalleryBinding.picture.setImageURI(imgUri)
     }
 
     override fun onDestroyView() {

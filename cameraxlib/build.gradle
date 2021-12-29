@@ -35,6 +35,9 @@ android {
     buildFeatures {
         viewBinding true
     }
+    lintOptions {
+        disable 'RestrictedApi'
+    }
 }
 
 dependencies {
@@ -77,9 +80,8 @@ dependencies {
     //WindowManager
     implementation 'androidx.window:window:1.0.0-alpha09'
 
-    // Glide
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
-    kapt 'com.github.bumptech.glide:compiler:4.12.0'
+    // Fresco
+    implementation 'com.facebook.fresco:fresco:2.6.0'
 
     // UI ktx
     implementation("androidx.activity:activity-ktx:1.4.0")

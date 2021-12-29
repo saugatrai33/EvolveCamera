@@ -33,18 +33,4 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
-    <!--<ImageButton
-        android:id="@+id/photo_view_button"
-        android:layout_width="@dimen/round_button_medium"
-        android:layout_height="@dimen/round_button_medium"
-        android:layout_marginEnd="@dimen/margin_small"
-        android:layout_marginBottom="@dimen/margin_xlarge"
-        android:background="@drawable/ic_outer_circle"
-        android:contentDescription="@string/gallery_button_alt"
-        android:padding="@dimen/spacing_large"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:srcCompat="@drawable/ic_photo" />-->
-
 </androidx.constraintlayout.widget.ConstraintLayout>

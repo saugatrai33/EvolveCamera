@@ -1,7 +1,9 @@
 package com.example.cameraxlib.ui
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.hardware.display.DisplayManager
 import android.net.Uri
@@ -10,6 +12,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.camera.core.*
+import androidx.camera.core.impl.utils.Exif
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -25,7 +28,6 @@ import com.example.cameraxlib.utils.Constants.PHOTO_EXTENSION
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -53,6 +55,7 @@ class CameraFragment : Fragment() {
     private lateinit var windowManager: WindowManager
     private lateinit var cameraControl: CameraControl
     private lateinit var cameraInfo: CameraInfo
+    private var rotationDegree: Int = 0
 
     private val displayManager by lazy {
         requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
@@ -72,9 +75,31 @@ class CameraFragment : Fragment() {
         override fun onDisplayChanged(displayId: Int) = view?.let { view ->
             if (displayId == this@CameraFragment.displayId) {
                 Log.d(TAG, "Rotation changed: ${view.display.rotation}")
-                imageCapture?.targetRotation = view.display.rotation
             }
         } ?: Unit
+    }
+
+    private val orientationEventListener by lazy {
+        object : OrientationEventListener(requireContext()) {
+            override fun onOrientationChanged(orientation: Int) {
+                if (orientation == ORIENTATION_UNKNOWN) {
+                    return
+                }
+
+                if (imageCapture == null) return
+                Log.d("orientation", "onOrientationChanged: orientation:: $orientation")
+                rotationDegree = orientation
+
+                val rotation = when (orientation) {
+                    in 45 until 135 -> Surface.ROTATION_270
+                    in 135 until 225 -> Surface.ROTATION_180
+                    in 225 until 315 -> Surface.ROTATION_90
+                    else -> Surface.ROTATION_0
+                }
+                imageCapture?.targetRotation = rotation
+//                preview?.targetRotation = rotation
+            }
+        }
     }
 
     // Listen to pinch gestures
@@ -112,7 +137,10 @@ class CameraFragment : Fragment() {
             Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
                 CameraFragmentDirections.actionCameraFragmentToPermissionsFragment()
             )
+            return
         }
+
+        orientationEventListener.enable()
     }
 
     override fun onDestroyView() {
@@ -125,6 +153,7 @@ class CameraFragment : Fragment() {
 
         // Unregister the listeners
         displayManager.unregisterDisplayListener(displayListener)
+        orientationEventListener.disable()
     }
 
     @SuppressLint("MissingPermission", "ClickableViewAccessibility")
@@ -184,24 +213,6 @@ class CameraFragment : Fragment() {
             }
         }
 
-    }
-
-    /**
-     * Inflate camera controls and update the UI manually upon config changes to avoid removing
-     * and re-adding the view finder from the view hierarchy; this provides a seamless rotation
-     * transition on devices that support it.
-     *
-     * NOTE: The flag is supported starting in Android 8 but there still is a small flash on the
-     * screen for devices that run Android 9 or below.
-     */
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-
-        // Rebind the camera with the updated display metrics
-        bindCameraUseCases()
-
-        // Enable or disable switching between cameras
-        updateCameraSwitchButton()
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
@@ -397,7 +408,6 @@ class CameraFragment : Fragment() {
 
         // Listener for button used to capture photo
         cameraUiContainerBinding?.cameraCaptureButton?.setOnClickListener {
-
             // Get a stable reference of the modifiable image capture use case
             imageCapture?.let { imageCapture ->
 
@@ -427,7 +437,13 @@ class CameraFragment : Fragment() {
                             val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
                             Log.d(TAG, "Photo capture succeeded: $savedUri")
 
-                            lifecycleScope.launch(Dispatchers.Main) {
+                            val intent = Intent()
+                            intent.data = savedUri
+                            intent.putExtra("rotation", rotationDegree)
+                            requireActivity().setResult(Activity.RESULT_OK, intent)
+                            requireActivity().finish()
+
+                            /*lifecycleScope.launch(Dispatchers.Main) {
                                 Navigation.findNavController(
                                     requireActivity(),
                                     R.id.fragment_container
@@ -435,7 +451,7 @@ class CameraFragment : Fragment() {
                                     CameraFragmentDirections
                                         .actionCameraFragmentToGalleryFragment(savedUri.toString())
                                 )
-                            }
+                            }*/
                         }
                     })
             }

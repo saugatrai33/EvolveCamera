@@ -16,10 +16,12 @@
             android:exported="false"
             android:resizeableActivity="true"
             android:rotationAnimation="seamless"
-            android:screenOrientation="fullUser"
-            tools:targetApi="O" >
+            android:screenOrientation="fullSensor"
+            tools:targetApi="O">
             <!-- Declare notch support -->
-            <meta-data android:name="android.notch_support" android:value="true"/>
+            <meta-data
+                android:name="android.notch_support"
+                android:value="true" />
         </activity>
     </application>
 
