@@ -52,6 +52,7 @@ class CameraFragment : Fragment() {
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var windowManager: WindowManager
+    private lateinit var toast: Toast
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -63,16 +64,45 @@ class CameraFragment : Fragment() {
                     return
                 }
 
-                if (imageCapture == null) return
-                Log.d("orientation", "onOrientationChanged: orientation:: $orientation")
+                when (orientation) {
+                    in 45 until 135 -> {
 
-                val rotation = when (orientation) {
-                    in 45 until 135 -> Surface.ROTATION_270
-                    in 135 until 225 -> Surface.ROTATION_180
-                    in 225 until 315 -> Surface.ROTATION_90
-                    else -> Surface.ROTATION_0
+                        if (orientation in 85..95) {
+                            showImageCaptureButton()
+                            imageCapture?.targetRotation = Surface.ROTATION_270
+                            return
+                        }
+                        showOrCancelToast()
+                        hideImageCaptureButton()
+                    }
+                    in 135 until 225 -> {
+                        if (orientation in 175..185) {
+                            showImageCaptureButton()
+                            imageCapture?.targetRotation = Surface.ROTATION_180
+                            return
+                        }
+                        showOrCancelToast()
+                        hideImageCaptureButton()
+                    }
+                    in 225 until 315 -> {
+                        if (orientation in 268..275) {
+                            showImageCaptureButton()
+                            imageCapture?.targetRotation = Surface.ROTATION_90
+                            return
+                        }
+                        showOrCancelToast()
+                        hideImageCaptureButton()
+                    }
+                    else -> {
+                        if (orientation in 0..10) {
+                            showImageCaptureButton()
+                            imageCapture?.targetRotation = Surface.ROTATION_0
+                        } else {
+                            showOrCancelToast()
+                            hideImageCaptureButton()
+                        }
+                    }
                 }
-                imageCapture?.targetRotation = rotation
             }
         }
     }
@@ -100,6 +130,11 @@ class CameraFragment : Fragment() {
         orientationEventListener.enable()
     }
 
+    override fun onPause() {
+        super.onPause()
+        orientationEventListener.disable()
+    }
+
     override fun onDestroyView() {
         binding = null
         cameraUiContainerBinding = null
@@ -118,6 +153,7 @@ class CameraFragment : Fragment() {
 
         cameraExecutor = Executors.newSingleThreadExecutor()
         windowManager = WindowManager(view.context)
+        toast = Toast.makeText(requireContext(), "Change orientation straight.", Toast.LENGTH_SHORT)
 
         // Determine the output directory
         outputDirectory = getOutputDirectory(requireContext())
@@ -167,7 +203,6 @@ class CameraFragment : Fragment() {
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-
         // Rebind the camera with the updated display metrics
         bindCameraUseCases()
 
@@ -352,6 +387,7 @@ class CameraFragment : Fragment() {
     }
 
     /** Method used to re-draw the camera UI controls, called every time configuration changes. */
+    // region re-draw Camera UI
     private fun updateCameraUi() {
 
         // Remove previous UI if any
@@ -425,6 +461,7 @@ class CameraFragment : Fragment() {
             }
         }
     }
+    // region
 
     /** Enabled or disabled a button to switch cameras depending on the available cameras */
     private fun updateCameraSwitchButton() {
@@ -433,6 +470,27 @@ class CameraFragment : Fragment() {
                 hasBackCamera(cameraProvider!!) && hasFrontCamera(cameraProvider!!)
         } catch (exception: CameraInfoUnavailableException) {
             cameraUiContainerBinding?.cameraSwitchButton?.isEnabled = false
+        }
+    }
+
+    private fun showOrCancelToast() {
+        toast.cancel()
+        toast.show()
+    }
+
+    private fun showImageCaptureButton() {
+        try {
+            cameraUiContainerBinding?.cameraCaptureButton?.visibility = View.VISIBLE
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun hideImageCaptureButton() {
+        try {
+            cameraUiContainerBinding?.cameraCaptureButton?.visibility = View.GONE
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
