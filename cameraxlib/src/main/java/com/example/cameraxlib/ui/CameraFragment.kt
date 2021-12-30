@@ -46,14 +46,12 @@ class CameraFragment : Fragment() {
 
     private lateinit var outputDirectory: File
 
-    private var displayId: Int = -1
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private var preview: Preview? = null
     private var imageCapture: ImageCapture? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var windowManager: WindowManager
-    private var rotationDegree: Int = 0
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -67,7 +65,6 @@ class CameraFragment : Fragment() {
 
                 if (imageCapture == null) return
                 Log.d("orientation", "onOrientationChanged: orientation:: $orientation")
-                rotationDegree = orientation
 
                 val rotation = when (orientation) {
                     in 45 until 135 -> Surface.ROTATION_270
@@ -119,12 +116,7 @@ class CameraFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
-
-        // Every time the orientation of device changes, update rotation for use cases
-
-        //Initialize WindowManager to retrieve display metrics
         windowManager = WindowManager(view.context)
 
         // Determine the output directory
@@ -132,10 +124,6 @@ class CameraFragment : Fragment() {
 
         // Wait for the views to be properly laid out
         binding!!.viewFinder.post {
-
-            // Keep track of the display in which this view is attached
-            displayId = binding!!.viewFinder.display.displayId
-
             // Build UI controls
             updateCameraUi()
 
@@ -185,6 +173,8 @@ class CameraFragment : Fragment() {
 
         // Enable or disable switching between cameras
         updateCameraSwitchButton()
+
+        updateCameraUi()
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
@@ -375,7 +365,6 @@ class CameraFragment : Fragment() {
             true
         )
 
-        // Listener for button used to capture photo
         cameraUiContainerBinding?.cameraCaptureButton?.setOnClickListener {
             // Get a stable reference of the modifiable image capture use case
             imageCapture?.let { imageCapture ->
@@ -406,21 +395,14 @@ class CameraFragment : Fragment() {
                             val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
                             Log.d(TAG, "Photo capture succeeded: $savedUri")
 
-/*                            val intent = Intent()
-                            intent.data = savedUri
-                            intent.putExtra("rotation", rotationDegree)
-                            requireActivity().setResult(Activity.RESULT_OK, intent)
-                            requireActivity().finish()*/
+                            val exif = Exif.createFromFile(photoFile)
+                            val rotation = exif.rotation
+                            Log.d("EXIF::Rotation", "onImageSaved: rotation:: $rotation")
 
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                Navigation.findNavController(
-                                    requireActivity(),
-                                    R.id.fragment_container
-                                ).navigate(
-                                    CameraFragmentDirections
-                                        .actionCameraFragmentToGalleryFragment(savedUri.toString())
-                                )
-                            }
+                            val intent = Intent()
+                            intent.data = savedUri
+                            requireActivity().setResult(Activity.RESULT_OK, intent)
+                            requireActivity().finish()
                         }
                     })
             }
@@ -432,7 +414,6 @@ class CameraFragment : Fragment() {
             // Disable the button until the camera is set up
             it.isEnabled = false
 
-            // Listener for button used to switch cameras. Only called if the button is enabled
             it.setOnClickListener {
                 lensFacing = if (CameraSelector.LENS_FACING_FRONT == lensFacing) {
                     CameraSelector.LENS_FACING_BACK

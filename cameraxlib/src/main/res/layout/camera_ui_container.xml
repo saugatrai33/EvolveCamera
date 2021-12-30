@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:layoutDirection="ltr">
 
-    <!-- Camera control and gallery buttons -->
     <ImageButton
         android:id="@+id/camera_switch_button"
         android:layout_width="@dimen/round_button_medium"

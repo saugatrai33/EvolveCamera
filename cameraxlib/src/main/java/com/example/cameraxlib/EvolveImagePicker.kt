@@ -36,5 +36,14 @@ class EvolveImagePicker {
             val intent = Intent(activity, EvolveCameraActivity::class.java)
             launcher.launch(intent)
         }
+
+        fun start(requestCode: Int) {
+            startActivity(requestCode)
+        }
+
+        private fun startActivity(requestCode: Int) {
+            val intent = Intent(activity, EvolveCameraActivity::class.java)
+            activity.startActivityForResult(intent, requestCode)
+        }
     }
 }

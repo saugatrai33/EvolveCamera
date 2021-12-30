@@ -5,7 +5,6 @@ import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import com.example.cameraxlib.R
-import com.example.cameraxlib.ui.CameraFragment
 import com.example.cameraxlib.utils.Constants.RATIO_16_9_VALUE
 import com.example.cameraxlib.utils.Constants.RATIO_4_3_VALUE
 import java.io.File
