@@ -15,6 +15,9 @@ import androidx.lifecycle.MutableLiveData
 class EvolveImagePicker {
 
     companion object {
+        const val KEY_FRONT_CAMERA = "frontCamera"
+        const val KEY_CAMERA_CAPTURE_FORCE = "forceCameraCapture"
+
         /**
          * Use this to use EvolveImagePicker in Activity Class
          *
@@ -28,22 +31,23 @@ class EvolveImagePicker {
 
     class Builder(private val activity: AppCompatActivity) {
 
-        fun start(launcher: ActivityResultLauncher<Intent>) {
-            startActivity(launcher)
+        fun start(
+            launcher: ActivityResultLauncher<Intent>,
+            forceImageCapture: Boolean = true,
+            enabledFrontCamera: Boolean = true
+        ) {
+            startActivity(launcher, forceImageCapture, enabledFrontCamera)
         }
 
-        private fun startActivity(launcher: ActivityResultLauncher<Intent>) {
+        private fun startActivity(
+            launcher: ActivityResultLauncher<Intent>,
+            forceImageCapture: Boolean,
+            enabledFrontCamera: Boolean
+        ) {
             val intent = Intent(activity, EvolveCameraActivity::class.java)
+            intent.putExtra(KEY_CAMERA_CAPTURE_FORCE, forceImageCapture)
+            intent.putExtra(KEY_FRONT_CAMERA, enabledFrontCamera)
             launcher.launch(intent)
-        }
-
-        fun start(requestCode: Int) {
-            startActivity(requestCode)
-        }
-
-        private fun startActivity(requestCode: Int) {
-            val intent = Intent(activity, EvolveCameraActivity::class.java)
-            activity.startActivityForResult(intent, requestCode)
         }
     }
 }

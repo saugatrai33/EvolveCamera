@@ -13,4 +13,7 @@
     <string name="delete_button_alt">Delete</string>
     <string name="delete_dialog">Delete current photo?</string>
     <string name="delete_title">Confirm</string>
+    <string name="warning_device_orientation">Tilt your phone to 0, 90, 180 or 270</string>
+    <string name="msg_warning">Tilt Phone Portrait or Landscape</string>
+    <string name="msg_success">Ready To Capture</string>
 </resources>

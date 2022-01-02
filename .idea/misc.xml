@@ -7,12 +7,17 @@
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/drawable/button_round_corners.xml" value="0.2755208333333333" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/drawable/circle.xml" value="0.2755208333333333" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/drawable/ic_photo.xml" value="0.2755208333333333" />
+        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/drawable/ic_shutter.xml" value="0.2755208333333333" />
+        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/drawable/ic_switch.xml" value="0.2755208333333333" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/drawable/img.xml" value="0.2755208333333333" />
-        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout-land/camera_ui_container.xml" value="0.18385416666666668" />
+        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout-land/camera_ui_container.xml" value="0.21957671957671956" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout/activity_evolve_camera.xml" value="0.1793478260869565" />
-        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout/camera_ui_container.xml" value="0.1598731884057971" />
+        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout/camera_ui_container.xml" value="0.259375" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout/fragment_camera.xml" value="0.1793478260869565" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout/fragment_gallery.xml" value="0.259375" />
+        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout/toast.xml" value="0.259375" />
+        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout/toast_success.xml" value="0.259375" />
+        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout/toast_warning.xml" value="0.259375" />
       </map>
     </option>
   </component>

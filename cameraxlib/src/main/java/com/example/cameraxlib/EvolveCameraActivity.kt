@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat

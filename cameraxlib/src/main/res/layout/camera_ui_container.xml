@@ -6,30 +6,57 @@
     android:layout_height="match_parent"
     android:layoutDirection="ltr">
 
-    <ImageButton
-        android:id="@+id/camera_switch_button"
-        android:layout_width="@dimen/round_button_medium"
-        android:layout_height="@dimen/round_button_medium"
-        android:layout_marginStart="@dimen/margin_small"
-        android:layout_marginBottom="@dimen/margin_xlarge"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/switch_camera_button_alt"
-        android:padding="@dimen/spacing_small"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:srcCompat="@drawable/ic_switch" />
+    <include
+        android:id="@+id/successView"
+        layout="@layout/toast_success"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/camera_capture_button"
-        android:layout_width="@dimen/round_button_large"
-        android:layout_height="@dimen/round_button_large"
-        android:layout_marginBottom="@dimen/shutter_button_margin"
-        android:background="@drawable/ic_shutter"
-        android:contentDescription="@string/capture_button_alt"
-        android:scaleType="fitCenter"
+    <include
+        android:id="@+id/warningView"
+        layout="@layout/toast_warning"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/camera_switch_button"
+            android:layout_width="@dimen/round_button_small"
+            android:layout_height="@dimen/round_button_small"
+            android:layout_margin="@dimen/margin_small"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/switch_camera_button_alt"
+            android:padding="@dimen/spacing_small"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_switch" />
+
+        <ImageButton
+            android:id="@+id/camera_capture_button"
+            android:layout_width="@dimen/margin_large"
+            android:layout_height="@dimen/margin_large"
+            android:layout_margin="@dimen/margin_xsmall"
+            android:background="@drawable/ic_shutter"
+            android:contentDescription="@string/capture_button_alt"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

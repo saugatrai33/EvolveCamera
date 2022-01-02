@@ -2,10 +2,8 @@ package com.example.cameraxlib.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -16,7 +14,6 @@ import androidx.camera.core.impl.utils.Exif
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.window.WindowManager
 import com.example.cameraxlib.R
@@ -25,12 +22,12 @@ import com.example.cameraxlib.databinding.FragmentCameraBinding
 import com.example.cameraxlib.utils.*
 import com.example.cameraxlib.utils.Constants.FILENAME
 import com.example.cameraxlib.utils.Constants.PHOTO_EXTENSION
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import com.example.cameraxlib.EvolveImagePicker.Companion.KEY_CAMERA_CAPTURE_FORCE
+import com.example.cameraxlib.EvolveImagePicker.Companion.KEY_FRONT_CAMERA
 
 /**
  * Main fragment for this app. Implements all camera operations including:
@@ -52,7 +49,9 @@ class CameraFragment : Fragment() {
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var windowManager: WindowManager
-    private lateinit var toast: Toast
+    private var forceImageCapture: Boolean = true
+    private var frontCameraEnable: Boolean = true
+
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -68,43 +67,47 @@ class CameraFragment : Fragment() {
                     in 45 until 135 -> {
 
                         if (orientation in 85..95) {
-                            showImageCaptureButton()
                             imageCapture?.targetRotation = Surface.ROTATION_270
+                            showSuccessToast()
                             return
                         }
-                        showOrCancelToast()
-                        hideImageCaptureButton()
+                        showWarningToast()
                     }
                     in 135 until 225 -> {
                         if (orientation in 175..185) {
-                            showImageCaptureButton()
                             imageCapture?.targetRotation = Surface.ROTATION_180
+                            showSuccessToast()
                             return
                         }
-                        showOrCancelToast()
-                        hideImageCaptureButton()
+                        showWarningToast()
                     }
                     in 225 until 315 -> {
                         if (orientation in 268..275) {
-                            showImageCaptureButton()
                             imageCapture?.targetRotation = Surface.ROTATION_90
+                            showSuccessToast()
                             return
                         }
-                        showOrCancelToast()
-                        hideImageCaptureButton()
+                        showWarningToast()
                     }
                     else -> {
                         if (orientation in 0..10) {
-                            showImageCaptureButton()
                             imageCapture?.targetRotation = Surface.ROTATION_0
+                            showSuccessToast()
                         } else {
-                            showOrCancelToast()
-                            hideImageCaptureButton()
+                            showWarningToast()
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        forceImageCapture = activity?.intent?.extras?.getBoolean(KEY_CAMERA_CAPTURE_FORCE) == true
+        frontCameraEnable = activity?.intent?.extras?.getBoolean(KEY_FRONT_CAMERA) == true
+        Log.d(TAG, "onCreate: forceCameraCapture:: $forceImageCapture")
+        Log.d(TAG, "onCreate: frontCameraEnable:: $forceImageCapture")
     }
 
     override fun onCreateView(
@@ -118,8 +121,6 @@ class CameraFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Make sure that all permissions are still present, since the
-        // user could have removed them while the app was in paused state.
         if (!PermissionsFragment.hasPermissions(requireContext())) {
             Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
                 CameraFragmentDirections.actionCameraFragmentToPermissionsFragment()
@@ -128,6 +129,7 @@ class CameraFragment : Fragment() {
         }
 
         orientationEventListener.enable()
+
     }
 
     override fun onPause() {
@@ -153,7 +155,6 @@ class CameraFragment : Fragment() {
 
         cameraExecutor = Executors.newSingleThreadExecutor()
         windowManager = WindowManager(view.context)
-        toast = Toast.makeText(requireContext(), "Change orientation straight.", Toast.LENGTH_SHORT)
 
         // Determine the output directory
         outputDirectory = getOutputDirectory(requireContext())
@@ -211,7 +212,9 @@ class CameraFragment : Fragment() {
 
         updateCameraUi()
     }
+    // endregion
 
+    // region Camera View code
     /** Initialize CameraX, and prepare to bind the camera use cases  */
     private fun setUpCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -387,7 +390,6 @@ class CameraFragment : Fragment() {
     }
 
     /** Method used to re-draw the camera UI controls, called every time configuration changes. */
-    // region re-draw Camera UI
     private fun updateCameraUi() {
 
         // Remove previous UI if any
@@ -460,38 +462,38 @@ class CameraFragment : Fragment() {
                 bindCameraUseCases()
             }
         }
+
+        if (forceImageCapture) {
+            cameraUiContainerBinding?.cameraCaptureButton?.visibility = View.VISIBLE
+        } else {
+            cameraUiContainerBinding?.cameraCaptureButton?.visibility = View.GONE
+        }
     }
-    // region
 
     /** Enabled or disabled a button to switch cameras depending on the available cameras */
     private fun updateCameraSwitchButton() {
         try {
             cameraUiContainerBinding?.cameraSwitchButton?.isEnabled =
-                hasBackCamera(cameraProvider!!) && hasFrontCamera(cameraProvider!!)
+                hasBackCamera(cameraProvider!!) || hasFrontCamera(cameraProvider!!)
+
+            if (frontCameraEnable) {
+                cameraUiContainerBinding?.cameraSwitchButton?.visibility = View.VISIBLE
+            } else {
+                cameraUiContainerBinding?.cameraSwitchButton?.visibility = View.GONE
+            }
         } catch (exception: CameraInfoUnavailableException) {
             cameraUiContainerBinding?.cameraSwitchButton?.isEnabled = false
         }
     }
+    // endregion
 
-    private fun showOrCancelToast() {
-        toast.cancel()
-        toast.show()
+    private fun showSuccessToast() {
+        cameraUiContainerBinding?.warningView?.layoutWarning?.visibility = View.GONE
+        cameraUiContainerBinding?.successView?.layoutSuccess?.visibility = View.VISIBLE
     }
 
-    private fun showImageCaptureButton() {
-        try {
-            cameraUiContainerBinding?.cameraCaptureButton?.visibility = View.VISIBLE
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    private fun showWarningToast() {
+        cameraUiContainerBinding?.successView?.layoutSuccess?.visibility = View.GONE
+        cameraUiContainerBinding?.warningView?.layoutWarning?.visibility = View.VISIBLE
     }
-
-    private fun hideImageCaptureButton() {
-        try {
-            cameraUiContainerBinding?.cameraCaptureButton?.visibility = View.GONE
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
 }

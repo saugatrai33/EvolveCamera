@@ -6,4 +6,15 @@
     <color name="icActive">#FFFFFFFF</color>
     <color name="icFocused">#DDFFFFFF</color>
     <color name="icPressed">#AAFFFFFF</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="tomatoRed">#FF0000</color>
+    <color name="green_700">#388e3c</color>
+    <color name="blueGrey_700">#37474f</color>
+    <color name="red_500">#f44336</color>
+    <color name="yellow_700">#fbc02d</color>
+    <color name="green_900">#1b5e20</color>
+    <color name="yellow_900">#f57f17</color>
+
 </resources>
