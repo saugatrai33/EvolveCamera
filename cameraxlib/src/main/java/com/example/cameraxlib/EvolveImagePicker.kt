@@ -31,6 +31,10 @@ class EvolveImagePicker {
             return Builder(activity)
         }
 
+        /**
+         * Calling from fragment
+         * */
+        @JvmStatic
         fun with(fragment: Fragment): Builder {
             return Builder(fragment)
         }
