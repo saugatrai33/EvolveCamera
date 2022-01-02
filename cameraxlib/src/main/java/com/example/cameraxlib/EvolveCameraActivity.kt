@@ -46,6 +46,7 @@ class EvolveCameraActivity : AppCompatActivity(),
             finishAfterTransition()
         } else {
             super.onBackPressed()
+            finish()
         }
     }
 
