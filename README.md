@@ -24,12 +24,11 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            val data = result.data!!.data
-            Log.d("MainActivity::", "result: ${data.toString()}")
-            Glide.with(this)
-                .load(data)
-                .apply(RequestOptions.centerCropTransform())
-                .into(image)
+            val photoUri: Uri? = result.data?.data
+            if (photoUri != null) {
+                // TODO:: work with image uri
+            }
+        }      .into(image)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
