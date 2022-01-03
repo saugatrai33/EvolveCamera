@@ -45,8 +45,8 @@ class EvolveCameraActivity : AppCompatActivity(),
             // Workaround for Android Q memory leak issue in IRequestFinishCallback$Stub.
             finishAfterTransition()
         } else {
-            super.onBackPressed()
             finish()
+            super.onBackPressed()
         }
     }
 

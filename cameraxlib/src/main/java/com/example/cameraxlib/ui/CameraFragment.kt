@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.camera.core.*
 import androidx.camera.core.impl.utils.Exif
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -108,6 +109,14 @@ class CameraFragment : Fragment() {
         frontCameraEnable = activity?.intent?.extras?.getBoolean(KEY_FRONT_CAMERA) == true
         Log.d(TAG, "onCreate: forceCameraCapture:: $forceImageCapture")
         Log.d(TAG, "onCreate: frontCameraEnable:: $forceImageCapture")
+
+        // onbackpress callback
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireActivity().finish()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), callback)
     }
 
     override fun onCreateView(
