@@ -26,6 +26,7 @@
         android:id="@+id/imgRotate"
         android:layout_width="200dp"
         android:layout_height="2dp"
+        android:visibility="gone"
         android:src="@color/green_900"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -44,8 +45,6 @@ class CameraFragment : Fragment() {
     private var binding: FragmentCameraBinding? = null
     private var cameraUiContainerBinding: CameraUiContainerBinding? = null
 
-//    private lateinit var outputDirectory: File
-
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private var preview: Preview? = null
     private var imageCapture: ImageCapture? = null
@@ -54,6 +53,7 @@ class CameraFragment : Fragment() {
     private lateinit var windowManager: WindowManager
     private var forceImageCapture: Boolean = true
     private var frontCameraEnable: Boolean = true
+    private val matrix = Matrix()
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -64,6 +64,8 @@ class CameraFragment : Fragment() {
                 if (orientation == ORIENTATION_UNKNOWN) {
                     return
                 }
+
+//                rotateView(orientation.toFloat())
 
                 when (orientation) {
                     in 45 until 135 -> {
@@ -165,10 +167,6 @@ class CameraFragment : Fragment() {
 
         cameraExecutor = Executors.newSingleThreadExecutor()
         windowManager = WindowManager(view.context)
-
-        // Determine the output directory
-//        outputDirectory = getOutputDirectory(requireContext())
-//        outputDirectory = context!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
 
         // Wait for the views to be properly laid out
         binding!!.viewFinder.post {
@@ -419,7 +417,6 @@ class CameraFragment : Fragment() {
             imageCapture?.let { imageCapture ->
 
                 // Create output file to hold the image
-//                val photoFile = createFile(outputDirectory, FILENAME, PHOTO_EXTENSION)
                 val photoFile = createImageFile(requireContext(), "")
 
                 // Setup image capture metadata
@@ -507,6 +504,15 @@ class CameraFragment : Fragment() {
     private fun showWarningToast() {
         cameraUiContainerBinding?.successView?.layoutSuccess?.visibility = View.GONE
         cameraUiContainerBinding?.warningView?.layoutWarning?.visibility = View.VISIBLE
+    }
+
+    private fun rotateView(angle: Float) {
+        try {
+            matrix.postRotate(angle)
+            cameraUiContainerBinding?.imgRotate?.imageMatrix = matrix
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 }
