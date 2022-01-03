@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -29,6 +30,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import com.example.cameraxlib.EvolveImagePicker.Companion.KEY_CAMERA_CAPTURE_FORCE
 import com.example.cameraxlib.EvolveImagePicker.Companion.KEY_FRONT_CAMERA
+import okhttp3.internal.Util
 
 /**
  * Main fragment for this app. Implements all camera operations including:
@@ -42,7 +44,7 @@ class CameraFragment : Fragment() {
     private var binding: FragmentCameraBinding? = null
     private var cameraUiContainerBinding: CameraUiContainerBinding? = null
 
-    private lateinit var outputDirectory: File
+//    private lateinit var outputDirectory: File
 
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private var preview: Preview? = null
@@ -52,7 +54,6 @@ class CameraFragment : Fragment() {
     private lateinit var windowManager: WindowManager
     private var forceImageCapture: Boolean = true
     private var frontCameraEnable: Boolean = true
-
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -166,7 +167,8 @@ class CameraFragment : Fragment() {
         windowManager = WindowManager(view.context)
 
         // Determine the output directory
-        outputDirectory = getOutputDirectory(requireContext())
+//        outputDirectory = getOutputDirectory(requireContext())
+//        outputDirectory = context!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
 
         // Wait for the views to be properly laid out
         binding!!.viewFinder.post {
@@ -417,7 +419,8 @@ class CameraFragment : Fragment() {
             imageCapture?.let { imageCapture ->
 
                 // Create output file to hold the image
-                val photoFile = createFile(outputDirectory, FILENAME, PHOTO_EXTENSION)
+//                val photoFile = createFile(outputDirectory, FILENAME, PHOTO_EXTENSION)
+                val photoFile = createImageFile(requireContext(), "")
 
                 // Setup image capture metadata
                 val metadata = ImageCapture.Metadata().apply {
@@ -505,4 +508,5 @@ class CameraFragment : Fragment() {
         cameraUiContainerBinding?.successView?.layoutSuccess?.visibility = View.GONE
         cameraUiContainerBinding?.warningView?.layoutWarning?.visibility = View.VISIBLE
     }
+
 }

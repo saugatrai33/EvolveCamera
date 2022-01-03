@@ -1,6 +1,8 @@
 package com.example.cameraxlib.utils
 
 import android.content.Context
+import android.os.Environment
+import android.util.Log
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -8,6 +10,7 @@ import com.example.cameraxlib.R
 import com.example.cameraxlib.utils.Constants.RATIO_16_9_VALUE
 import com.example.cameraxlib.utils.Constants.RATIO_4_3_VALUE
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
@@ -59,3 +62,23 @@ fun createFile(baseFolder: File, format: String, extension: String) =
         baseFolder, SimpleDateFormat(format, Locale.US)
             .format(System.currentTimeMillis()) + extension
     )
+
+@Throws(IOException::class)
+fun createImageFile(context: Context, fileName: String): File {
+    // Create an image file name
+    val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+    return File.createTempFile(
+        createFileName(fileName), /* prefix */
+        ".jpg", /* suffix */
+        storageDir /* directory */
+    )
+}
+
+/**
+ * create file name for the given monitoring of the given project.
+ *
+ * @return String obtained after concatenation of timestamp with projectId and serverId */
+private fun createFileName(fileName: String = ""): String {
+    val timeStamp = Date().time
+    return "$fileName$timeStamp"
+}
