@@ -1,51 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/layoutWarning"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:id="@+id/layoutWarning"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/margin_xxsmall"
+    android:elevation="@dimen/margin_xsmall"
+    app:cardBackgroundColor="@color/yellow_900"
+    app:cardCornerRadius="@dimen/margin_xsmall">
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_xxsmall"
-        android:elevation="@dimen/margin_xsmall"
-        android:padding="@dimen/margin_xsmall"
-        app:cardBackgroundColor="@color/yellow_900"
-        app:cardCornerRadius="@dimen/margin_xlarge"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:padding="@dimen/margin_xxsmall">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/margin_xxsmall">
+        <ImageView
+            android:layout_width="@dimen/margin_medium"
+            android:layout_height="@dimen/margin_small"
+            android:src="@drawable/ic_baseline_warning_24" />
 
-            <ImageView
-                android:id="@+id/imgWarning"
-                android:layout_width="@dimen/margin_medium"
-                android:layout_height="@dimen/margin_small"
-                android:src="@drawable/ic_baseline_warning_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="@dimen/margin_xxsmall"
+            android:gravity="center"
+            android:text="@string/msg_warning"
+            android:textColor="@color/white" />
+    </LinearLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="@dimen/margin_xsmall"
-                android:gravity="center"
-                android:text="@string/msg_warning"
-                android:textColor="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/imgWarning"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.cardview.widget.CardView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

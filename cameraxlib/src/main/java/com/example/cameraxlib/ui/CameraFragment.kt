@@ -53,7 +53,6 @@ class CameraFragment : Fragment() {
     private lateinit var windowManager: WindowManager
     private var forceImageCapture: Boolean = true
     private var frontCameraEnable: Boolean = true
-    private val matrix = Matrix()
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -65,40 +64,46 @@ class CameraFragment : Fragment() {
                     return
                 }
 
-//                rotateView(orientation.toFloat())
-
                 when (orientation) {
                     in 45 until 135 -> {
 
                         if (orientation in 85..95) {
                             imageCapture?.targetRotation = Surface.ROTATION_270
                             showSuccessToast()
+                            readyBg()
                             return
                         }
                         showWarningToast()
+                        warningBg()
                     }
                     in 135 until 225 -> {
                         if (orientation in 175..185) {
                             imageCapture?.targetRotation = Surface.ROTATION_180
                             showSuccessToast()
+                            readyBg()
                             return
                         }
                         showWarningToast()
+                        warningBg()
                     }
                     in 225 until 315 -> {
                         if (orientation in 268..275) {
                             imageCapture?.targetRotation = Surface.ROTATION_90
                             showSuccessToast()
+                            readyBg()
                             return
                         }
                         showWarningToast()
+                        warningBg()
                     }
                     else -> {
                         if (orientation in 0..10) {
                             imageCapture?.targetRotation = Surface.ROTATION_0
                             showSuccessToast()
+                            readyBg()
                         } else {
                             showWarningToast()
+                            warningBg()
                         }
                     }
                 }
@@ -506,13 +511,12 @@ class CameraFragment : Fragment() {
         cameraUiContainerBinding?.warningView?.layoutWarning?.visibility = View.VISIBLE
     }
 
-    private fun rotateView(angle: Float) {
-        try {
-            matrix.postRotate(angle)
-            cameraUiContainerBinding?.imgRotate?.imageMatrix = matrix
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    private fun readyBg() {
+        cameraUiContainerBinding?.cameraCaptureButton?.setBackgroundResource(R.drawable.ic_shutter_ready)
+    }
+
+    private fun warningBg() {
+        cameraUiContainerBinding?.cameraCaptureButton?.setBackgroundResource(R.drawable.ic_shutter_warning)
     }
 
 }
