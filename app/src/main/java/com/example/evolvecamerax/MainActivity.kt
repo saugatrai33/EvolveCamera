@@ -3,6 +3,7 @@ package com.example.evolvecamerax
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
@@ -10,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cameraxlib.EvolveImagePicker
 import com.squareup.picasso.Picasso
+import kotlin.math.log
 
 
 class MainActivity : AppCompatActivity() {

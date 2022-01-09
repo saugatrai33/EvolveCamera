@@ -78,7 +78,7 @@ fun createImageFile(context: Context, fileName: String): File {
  * create file name for the given monitoring of the given project.
  *
  * @return String obtained after concatenation of timestamp with projectId and serverId */
-private fun createFileName(fileName: String = ""): String {
+private fun createFileName(fileName: String): String {
     val timeStamp = Date().time
     return "$fileName$timeStamp"
 }

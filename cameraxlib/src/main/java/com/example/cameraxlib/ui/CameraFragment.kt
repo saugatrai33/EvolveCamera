@@ -30,6 +30,7 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import com.example.cameraxlib.EvolveImagePicker.Companion.KEY_CAMERA_CAPTURE_FORCE
+import com.example.cameraxlib.EvolveImagePicker.Companion.KEY_FILENAME
 import com.example.cameraxlib.EvolveImagePicker.Companion.KEY_FRONT_CAMERA
 import okhttp3.internal.Util
 
@@ -53,6 +54,7 @@ class CameraFragment : Fragment() {
     private lateinit var windowManager: WindowManager
     private var forceImageCapture: Boolean = true
     private var frontCameraEnable: Boolean = true
+    private var imgFileName: String = ""
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -115,6 +117,7 @@ class CameraFragment : Fragment() {
         super.onCreate(savedInstanceState)
         forceImageCapture = activity?.intent?.extras?.getBoolean(KEY_CAMERA_CAPTURE_FORCE) == true
         frontCameraEnable = activity?.intent?.extras?.getBoolean(KEY_FRONT_CAMERA) == true
+        imgFileName = activity?.intent?.extras?.getString(KEY_FILENAME, "")!!
         Log.d(TAG, "onCreate: forceCameraCapture:: $forceImageCapture")
         Log.d(TAG, "onCreate: frontCameraEnable:: $forceImageCapture")
 
@@ -422,7 +425,7 @@ class CameraFragment : Fragment() {
             imageCapture?.let { imageCapture ->
 
                 // Create output file to hold the image
-                val photoFile = createImageFile(requireContext(), "")
+                val photoFile = createImageFile(requireContext(), imgFileName)
 
                 // Setup image capture metadata
                 val metadata = ImageCapture.Metadata().apply {

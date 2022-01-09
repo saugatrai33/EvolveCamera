@@ -20,6 +20,7 @@ class EvolveImagePicker {
     companion object {
         const val KEY_FRONT_CAMERA = "frontCamera"
         const val KEY_CAMERA_CAPTURE_FORCE = "forceCameraCapture"
+        const val KEY_FILENAME = "IMG_FILENAME"
 
         /**
          * Use this to use EvolveImagePicker in Activity Class
@@ -51,15 +52,17 @@ class EvolveImagePicker {
         fun start(
             launcher: ActivityResultLauncher<Intent>,
             forceImageCapture: Boolean = true,
-            enabledFrontCamera: Boolean = true
+            enabledFrontCamera: Boolean = true,
+            fileName: String = ""
         ) {
-            startActivity(launcher, forceImageCapture, enabledFrontCamera)
+            startActivity(launcher, forceImageCapture, enabledFrontCamera, fileName)
         }
 
         private fun startActivity(
             launcher: ActivityResultLauncher<Intent>,
             forceImageCapture: Boolean,
-            enabledFrontCamera: Boolean
+            enabledFrontCamera: Boolean,
+            fileName: String
         ) {
             val imagePickerIntent: Intent = if (fragment != null) {
                 Intent(fragment?.requireActivity(), EvolveCameraActivity::class.java)
@@ -68,6 +71,7 @@ class EvolveImagePicker {
             }
             imagePickerIntent.putExtra(KEY_CAMERA_CAPTURE_FORCE, forceImageCapture)
             imagePickerIntent.putExtra(KEY_FRONT_CAMERA, enabledFrontCamera)
+            imagePickerIntent.putExtra(KEY_FILENAME, fileName)
             launcher.launch(imagePickerIntent)
         }
     }
