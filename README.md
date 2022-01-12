@@ -26,9 +26,9 @@ class MainActivity : AppCompatActivity() {
         ) { result ->
             val photoUri: Uri? = result.data?.data
             if (photoUri != null) {
-                // TODO:: work with image uri
+                imageUri = photoUri
+                showImage()
             }
-        }      .into(image)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
