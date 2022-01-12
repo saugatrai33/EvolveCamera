@@ -7,6 +7,6 @@ dependencyResolutionManagement {
         maven { url "https://jitpack.io" }
     }
 }
-rootProject.name = "EvolveCameraX"
+rootProject.name = "EvolveCamera"
 include ':app'
-include ':cameraxlib'
+include ':cameralib'
