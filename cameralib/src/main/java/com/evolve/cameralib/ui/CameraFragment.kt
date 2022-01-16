@@ -72,69 +72,27 @@ class CameraFragment : Fragment() {
                 if (orientation == ORIENTATION_UNKNOWN) {
                     return
                 }
-
-                /*val rotation = when (orientation) {
+                val rotation = when (orientation) {
                     in 45 until 135 -> Surface.ROTATION_270
                     in 135 until 225 -> Surface.ROTATION_180
                     in 225 until 315 -> Surface.ROTATION_90
                     else -> Surface.ROTATION_0
                 }
-
-                imageCapture?.targetRotation = rotation*/
-
-                when (orientation) {
-                    in 45 until 135 -> {
-                        if (!forceImageCapture) return
-                        imageCapture?.targetRotation = Surface.ROTATION_270
-                        if (orientation in 85..95) {
-                            showSuccessToast()
-                            readyBg()
-                            enableCaptureBtn()
-                            return
-                        }
-                        showWarningToast()
-                        warningBg()
-                        disableCaptureBtn()
-                    }
-                    in 135 until 225 -> {
-                        if (!forceImageCapture) return
-                        imageCapture?.targetRotation = Surface.ROTATION_180
-                        if (orientation in 175..185) {
-                            showSuccessToast()
-                            readyBg()
-                            enableCaptureBtn()
-                            return
-                        }
-                        showWarningToast()
-                        warningBg()
-                        disableCaptureBtn()
-                    }
-                    in 225 until 315 -> {
-                        if (!forceImageCapture) return
-                        imageCapture?.targetRotation = Surface.ROTATION_90
-                        if (orientation in 265..275) {
-                            showSuccessToast()
-                            readyBg()
-                            enableCaptureBtn()
-                            return
-                        }
-                        showWarningToast()
-                        warningBg()
-                        disableCaptureBtn()
-                    }
-                    else -> {
-                        if (!forceImageCapture) return
-                        imageCapture?.targetRotation = Surface.ROTATION_0
-                        if (orientation in 0..10) {
-                            showSuccessToast()
-                            readyBg()
-                            enableCaptureBtn()
-                        } else {
-                            showWarningToast()
-                            warningBg()
-                            disableCaptureBtn()
-                        }
-                    }
+                imageCapture?.targetRotation = rotation
+                val isCaptureReady = when (orientation) {
+                    in 0..10 -> true
+                    in 85..95 -> true
+                    in 265..275 -> true
+                    else -> false
+                }
+                if (isCaptureReady) {
+                    showSuccessToast()
+                    readyBg()
+                    enableCaptureBtn()
+                } else {
+                    showWarningToast()
+                    warningBg()
+                    disableCaptureBtn()
                 }
             }
         }
@@ -472,7 +430,6 @@ class CameraFragment : Fragment() {
 
                 // Setup image capture metadata
                 val metadata = ImageCapture.Metadata().apply {
-
                     // Mirror image when using the front camera
                     isReversedHorizontal = lensFacing == CameraSelector.LENS_FACING_FRONT
                 }
