@@ -82,17 +82,18 @@ class CameraFragment : Fragment() {
                 val isCaptureReady = when (orientation) {
                     in 0..10 -> true
                     in 85..95 -> true
+                    in 175..185 -> true
                     in 265..275 -> true
                     else -> false
                 }
                 if (isCaptureReady) {
+                    enableCaptureBtn()
                     showSuccessToast()
                     readyBg()
-                    enableCaptureBtn()
                 } else {
+                    disableCaptureBtn()
                     showWarningToast()
                     warningBg()
-                    disableCaptureBtn()
                 }
             }
         }
