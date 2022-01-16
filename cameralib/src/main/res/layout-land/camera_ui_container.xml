@@ -39,8 +39,8 @@
 
         <ImageButton
             android:id="@id/camera_switch_button"
-            android:layout_width="@dimen/round_button_small"
-            android:layout_height="@dimen/round_button_small"
+            android:layout_width="@dimen/round_button_medium"
+            android:layout_height="@dimen/round_button_medium"
             android:layout_margin="@dimen/margin_small"
             android:background="@android:color/transparent"
             android:contentDescription="@string/gallery_button_alt"

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -46,6 +47,7 @@ class CameraFragment : Fragment() {
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var windowManager: WindowManager
+    private var mExifRotation = Surface.ROTATION_0
 
     private val forceImageCapture: Boolean by lazy {
         activity?.intent?.extras?.getBoolean(KEY_CAMERA_CAPTURE_FORCE) == true
@@ -61,16 +63,20 @@ class CameraFragment : Fragment() {
     private lateinit var cameraExecutor: ExecutorService
 
     private val orientationEventListener by lazy {
-        object : OrientationEventListener(requireContext()) {
+        object : OrientationEventListener(
+            requireContext(),
+            SensorManager.SENSOR_DELAY_NORMAL
+        ) {
             override fun onOrientationChanged(orientation: Int) {
                 if (orientation == ORIENTATION_UNKNOWN) {
+                    mExifRotation = Surface.ROTATION_0
                     return
                 }
                 when (orientation) {
                     in 45 until 135 -> {
                         if (!forceImageCapture) return
+                        mExifRotation = Surface.ROTATION_270
                         if (orientation in 85..95) {
-                            imageCapture?.targetRotation = Surface.ROTATION_270
                             showSuccessToast()
                             readyBg()
                             enableCaptureBtn()
@@ -82,8 +88,8 @@ class CameraFragment : Fragment() {
                     }
                     in 135 until 225 -> {
                         if (!forceImageCapture) return
+                        mExifRotation = Surface.ROTATION_180
                         if (orientation in 175..185) {
-                            imageCapture?.targetRotation = Surface.ROTATION_180
                             showSuccessToast()
                             readyBg()
                             enableCaptureBtn()
@@ -95,8 +101,8 @@ class CameraFragment : Fragment() {
                     }
                     in 225 until 315 -> {
                         if (!forceImageCapture) return
+                        mExifRotation = Surface.ROTATION_90
                         if (orientation in 268..275) {
-                            imageCapture?.targetRotation = Surface.ROTATION_90
                             showSuccessToast()
                             readyBg()
                             enableCaptureBtn()
@@ -108,15 +114,17 @@ class CameraFragment : Fragment() {
                     }
                     else -> {
                         if (!forceImageCapture) return
-                        if (orientation in 0..10) {
-                            imageCapture?.targetRotation = Surface.ROTATION_0
-                            showSuccessToast()
-                            readyBg()
-                            enableCaptureBtn()
-                        } else {
-                            showWarningToast()
-                            warningBg()
-                            disableCaptureBtn()
+                        if (orientation >= 315 || orientation < 45) {
+                            mExifRotation = Surface.ROTATION_0
+                            if (orientation in 0..10) {
+                                showSuccessToast()
+                                readyBg()
+                                enableCaptureBtn()
+                            } else {
+                                showWarningToast()
+                                warningBg()
+                                disableCaptureBtn()
+                            }
                         }
                     }
                 }
@@ -428,6 +436,8 @@ class CameraFragment : Fragment() {
         cameraUiContainerBinding?.cameraCaptureButton?.setOnClickListener {
             // Get a stable reference of the modifiable image capture use case
             imageCapture?.let { imageCapture ->
+
+                imageCapture.targetRotation = mExifRotation
 
                 // Create output file to hold the image
                 val photoFile = createImageFile(requireContext(), imgFileName)

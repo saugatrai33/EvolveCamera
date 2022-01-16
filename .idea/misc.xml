@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCamera/cameralib/src/main/res/layout-land/camera_ui_container.xml" value="0.16354166666666667" />
+        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCamera/cameralib/src/main/res/layout/camera_ui_container.xml" value="0.259375" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/app/src/main/res/layout/activity_main.xml" value="0.259375" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/drawable/button_round_corners.xml" value="0.2755208333333333" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/drawable/circle.xml" value="0.2755208333333333" />
