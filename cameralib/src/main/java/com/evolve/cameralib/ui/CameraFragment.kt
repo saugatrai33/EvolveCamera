@@ -285,7 +285,8 @@ class CameraFragment : Fragment() {
         val screenAspectRatio = aspectRatio(metrics.width(), metrics.height())
         Log.d(TAG, "Preview aspect ratio: $screenAspectRatio")
 
-        val rotation = binding!!.viewFinder.display.rotation
+//        val rotation = binding!!.viewFinder.display.rotation
+        val rotation = Display.DEFAULT_DISPLAY
 
         // CameraProvider
         val cameraProvider = cameraProvider
