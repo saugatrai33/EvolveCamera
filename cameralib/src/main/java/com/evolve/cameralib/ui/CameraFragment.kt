@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.hardware.SensorManager
 import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Bundle
@@ -49,6 +48,7 @@ class CameraFragment : Fragment() {
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var windowManager: WindowManager
+    private var displayId: Int = -1
 
     private val forceImageCapture: Boolean by lazy {
         activity?.intent?.extras?.getBoolean(KEY_CAMERA_CAPTURE_FORCE) == true
@@ -140,6 +140,27 @@ class CameraFragment : Fragment() {
         }
     }
 
+    private val displayManager by lazy {
+        requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+    }
+
+    /**
+     * We need a display listener for orientation changes that do not trigger a configuration
+     * change, for example if we choose to override config change in manifest or for 180-degree
+     * orientation changes.
+     */
+    private val displayListener = object : DisplayManager.DisplayListener {
+        override fun onDisplayAdded(displayId: Int) = Unit
+        override fun onDisplayRemoved(displayId: Int) = Unit
+        override fun onDisplayChanged(displayId: Int) = view?.let { view ->
+            println("AAA:: onDisplayChanged: ${view.display.rotation}")
+            if (displayId == this@CameraFragment.displayId) {
+                Log.d(TAG, "Rotation changed: ${view.display.rotation}")
+                imageCapture?.targetRotation = view.display.rotation
+            }
+        } ?: Unit
+    }
+
     override fun onStart() {
         super.onStart()
         orientationEventListener.enable()
@@ -187,6 +208,7 @@ class CameraFragment : Fragment() {
 
         // Shut down our background executor
         cameraExecutor.shutdown()
+        displayManager.unregisterDisplayListener(displayListener)
     }
 
     @SuppressLint("MissingPermission", "ClickableViewAccessibility")
@@ -194,6 +216,7 @@ class CameraFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+        displayManager.registerDisplayListener(displayListener, null)
         windowManager = WindowManager(view.context)
 
         // Wait for the views to be properly laid out
@@ -285,8 +308,7 @@ class CameraFragment : Fragment() {
         val screenAspectRatio = aspectRatio(metrics.width(), metrics.height())
         Log.d(TAG, "Preview aspect ratio: $screenAspectRatio")
 
-//        val rotation = binding!!.viewFinder.display.rotation
-        val rotation = Display.DEFAULT_DISPLAY
+        val rotation = binding!!.viewFinder.display.rotation
 
         // CameraProvider
         val cameraProvider = cameraProvider
@@ -311,7 +333,7 @@ class CameraFragment : Fragment() {
             .setTargetAspectRatio(screenAspectRatio)
             // Set initial target rotation, we will have to call this again if rotation changes
             // during the lifecycle of this use case
-            .setTargetRotation(1)
+            .setTargetRotation(rotation)
             .build()
 
         // Must unbind the use-cases before rebinding them
