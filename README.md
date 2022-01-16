@@ -9,7 +9,7 @@ Initial release
   
 In you build.gradle app level.
 ```
-implementation 'com.github.saugatrai33:EvolveCamera:2.0.4'
+implementation 'com.github.saugatrai33:EvolveCamera:2.0.6'
 ```
   
 Then in you activity.
