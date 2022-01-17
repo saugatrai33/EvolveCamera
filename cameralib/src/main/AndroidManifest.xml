@@ -17,7 +17,7 @@
             android:hardwareAccelerated="true"
             android:resizeableActivity="true"
             android:rotationAnimation="seamless"
-            android:screenOrientation="fullUser"
+            android:screenOrientation="fullSensor"
             tools:targetApi="O">
 
             <!-- Declare notch support -->
