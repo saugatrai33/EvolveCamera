@@ -15,6 +15,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.camera.core.*
 import androidx.camera.core.impl.utils.Exif
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
@@ -48,7 +50,7 @@ class CameraFragment : Fragment() {
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var windowManager: WindowManager
-    private var displayId: Int = -1
+    private var deviceOrientation = OrientationEventListener.ORIENTATION_UNKNOWN
 
     private val forceImageCapture: Boolean by lazy {
         activity?.intent?.extras?.getBoolean(KEY_CAMERA_CAPTURE_FORCE) == true
@@ -68,10 +70,11 @@ class CameraFragment : Fragment() {
             requireContext()
         ) {
             override fun onOrientationChanged(orientation: Int) {
-                println("orientation:: $orientation")
+                println("AAA:: orientation: $orientation")
                 if (orientation == ORIENTATION_UNKNOWN) {
                     return
                 }
+                deviceOrientation = orientation
                 val rotation = when (orientation) {
                     in 45 until 135 -> Surface.ROTATION_270
                     in 135 until 225 -> Surface.ROTATION_180
@@ -97,27 +100,6 @@ class CameraFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private val displayManager by lazy {
-        requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-    }
-
-    /**
-     * We need a display listener for orientation changes that do not trigger a configuration
-     * change, for example if we choose to override config change in manifest or for 180-degree
-     * orientation changes.
-     */
-    private val displayListener = object : DisplayManager.DisplayListener {
-        override fun onDisplayAdded(displayId: Int) = Unit
-        override fun onDisplayRemoved(displayId: Int) = Unit
-        override fun onDisplayChanged(displayId: Int) = view?.let { view ->
-            println("AAA:: onDisplayChanged: ${view.display.rotation}")
-            if (displayId == this@CameraFragment.displayId) {
-                Log.d(TAG, "Rotation changed: ${view.display.rotation}")
-                imageCapture?.targetRotation = view.display.rotation
-            }
-        } ?: Unit
     }
 
     override fun onStart() {
@@ -167,7 +149,6 @@ class CameraFragment : Fragment() {
 
         // Shut down our background executor
         cameraExecutor.shutdown()
-        displayManager.unregisterDisplayListener(displayListener)
     }
 
     @SuppressLint("MissingPermission", "ClickableViewAccessibility")
@@ -175,7 +156,6 @@ class CameraFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-        displayManager.registerDisplayListener(displayListener, null)
         windowManager = WindowManager(view.context)
 
         // Wait for the views to be properly laid out
@@ -422,6 +402,9 @@ class CameraFragment : Fragment() {
             true
         )
 
+        // alter camera control position
+//        changeCameraControlPosition()
+
         cameraUiContainerBinding?.cameraCaptureButton?.setOnClickListener {
             // Get a stable reference of the modifiable image capture use case
             imageCapture?.let { imageCapture ->
@@ -530,6 +513,102 @@ class CameraFragment : Fragment() {
 
     private fun disableCaptureBtn() {
         cameraUiContainerBinding?.cameraCaptureButton?.isEnabled = false
+    }
+
+    private fun changeCameraControlPosition() {
+        println("AAA:: device orientation: $deviceOrientation")
+        val cameraUIContainerView: ConstraintLayout =
+            cameraUiContainerBinding?.controlUIContainer as ConstraintLayout
+        val cameraControlView: ConstraintLayout =
+            cameraUiContainerBinding?.controlView as ConstraintLayout
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(cameraUIContainerView)
+        when (deviceOrientation) {
+            in 0..10 -> {
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.START,
+                    cameraUIContainerView.id,
+                    ConstraintSet.START
+                )
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.BOTTOM,
+                    cameraUIContainerView.id,
+                    ConstraintSet.BOTTOM
+                )
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.END,
+                    cameraUIContainerView.id,
+                    ConstraintSet.END
+                )
+                constraintSet.applyTo(cameraUIContainerView)
+            }
+            in 85..95 -> {
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.START,
+                    cameraUIContainerView.id,
+                    ConstraintSet.START
+                )
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.BOTTOM,
+                    cameraUIContainerView.id,
+                    ConstraintSet.BOTTOM
+                )
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.TOP,
+                    cameraUIContainerView.id,
+                    ConstraintSet.TOP
+                )
+                constraintSet.applyTo(cameraUIContainerView)
+            }
+            in 175..185 -> {
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.START,
+                    cameraUIContainerView.id,
+                    ConstraintSet.START
+                )
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.TOP,
+                    cameraUIContainerView.id,
+                    ConstraintSet.TOP
+                )
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.END,
+                    cameraUIContainerView.id,
+                    ConstraintSet.END
+                )
+                constraintSet.applyTo(cameraControlView)
+            }
+            in 265..275 -> {
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.END,
+                    cameraUIContainerView.id,
+                    ConstraintSet.END
+                )
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.TOP,
+                    cameraUIContainerView.id,
+                    ConstraintSet.TOP
+                )
+                constraintSet.connect(
+                    cameraControlView.id,
+                    ConstraintSet.BOTTOM,
+                    cameraUIContainerView.id,
+                    ConstraintSet.BOTTOM
+                )
+                constraintSet.applyTo(cameraControlView)
+            }
+        }
     }
 
 }
