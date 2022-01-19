@@ -93,5 +93,5 @@ private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
         }
 ```
 
-## IMAGE format reference.
+## Image format reference.
 [https://developer.android.com/reference/android/graphics/ImageFormat] Supported image format depends upon device.
