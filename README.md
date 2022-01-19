@@ -72,5 +72,18 @@ private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
         }
 ```
 
-Requires two parameters: 'context' & 'ActivityLauncher'
+# With Fragment
+```
+EvolveImagePicker
+	.with(requiredActivity())
+        .start(evolveActivityResultLauncher)
+```
   
+
+
+# With Activity
+```
+EvolveImagePicker
+	.with(this)
+        .start(evolveActivityResultLauncher)
+```
