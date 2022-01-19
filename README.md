@@ -7,7 +7,7 @@ Initial release
 
 ## Install with Gradle
 
-```build.grdle``` project level
+```build.gradle``` project level
 
 ```
 allprojects {
@@ -23,7 +23,7 @@ allprojects {
 implementation 'com.github.saugatrai33:EvolveCamera:2.0.6'
 ```
   
-Then in you activity.
+## Sample code
 ```
 class MainActivity : AppCompatActivity() {
 
@@ -50,28 +50,6 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-Start calling with 
-```
-EvolveImagePicker
-	.with(this)
-        .start(evolveActivityResultLauncher)
-```
-
-Get the result as a uri 
-```
-private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            val data = result.data!!.data
-            Log.d("MainActivity::", "result: ${data.toString()}")
-            Glide.with(this)
-                .load(data)
-                .apply(RequestOptions.centerCropTransform())
-                .into(image)
-        }
-```
-
 # With Fragment
 ```
 EvolveImagePicker
@@ -86,4 +64,19 @@ EvolveImagePicker
 EvolveImagePicker
 	.with(this)
         .start(evolveActivityResultLauncher)
+```
+
+## Get the result as a uri
+```
+private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            val data = result.data!!.data
+            Log.d("MainActivity::", "result: ${data.toString()}")
+            Glide.with(this)
+                .load(data)
+                .apply(RequestOptions.centerCropTransform())
+                .into(image)
+        }
 ```
