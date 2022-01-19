@@ -6,13 +6,24 @@ Initial release
 
 
 ## Install with Gradle
+
+```build.gradle``` project level
+
+```
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	}
+}
+```
   
-In you build.gradle app level.
+```build.gradle``` app level
 ```
 implementation 'com.github.saugatrai33:EvolveCamera:2.0.6'
 ```
   
-Then in you activity.
+## Sample code
 ```
 class MainActivity : AppCompatActivity() {
 
@@ -36,17 +47,38 @@ class MainActivity : AppCompatActivity() {
         EvolveImagePicker.with(this)
             .start(evolveActivityResultLauncher)
     }
+    
+    private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
+		registerForActivityResult(
+		    ActivityResultContracts.StartActivityForResult()
+	) { result ->
+	    val data = result.data!!.data
+	    Log.d("MainActivity::", "result: ${data.toString()}")
+	    Glide.with(this)
+		.load(data)
+		.apply(RequestOptions.centerCropTransform())
+		.into(image)
+	}
 }
 ```
 
-Start calling with 
+# With Fragment
+```
+EvolveImagePicker
+	.with(requiredActivity())
+        .start(evolveActivityResultLauncher)
+```
+  
+
+
+# With Activity
 ```
 EvolveImagePicker
 	.with(this)
         .start(evolveActivityResultLauncher)
 ```
 
-Get the result as a uri 
+## Get the result as a uri
 ```
 private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
@@ -60,6 +92,3 @@ private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
                 .into(image)
         }
 ```
-
-Requires two parameters: 'context' & 'ActivityLauncher'
-  
