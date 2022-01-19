@@ -14,6 +14,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.camera.core.*
+import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
 import androidx.camera.core.impl.utils.Exif
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -32,6 +33,7 @@ import java.util.concurrent.Executors
 import com.evolve.cameralib.EvolveImagePicker.Companion.KEY_CAMERA_CAPTURE_FORCE
 import com.evolve.cameralib.EvolveImagePicker.Companion.KEY_FILENAME
 import com.evolve.cameralib.EvolveImagePicker.Companion.KEY_FRONT_CAMERA
+import com.evolve.cameralib.EvolveImagePicker.Companion.KEY_IMAGE_CAPTURE_FORMAT
 
 /**
  * Main fragment for this app. Implements all camera operations including:
@@ -62,6 +64,9 @@ class CameraFragment : Fragment() {
     private val imgFileName: String by lazy {
         activity?.intent?.extras?.getString(KEY_FILENAME, "")!!
     }
+    private val imageCaptureFormat: Int by lazy {
+        activity?.intent?.extras?.getInt(KEY_IMAGE_CAPTURE_FORMAT, ImageFormat.JPEG)!!
+    }
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -90,6 +95,7 @@ class CameraFragment : Fragment() {
                     in 265..275 -> true
                     else -> false
                 }
+                if (!forceImageCapture) return
                 if (isCaptureReady) {
                     enableCaptureBtn()
                     showSuccessToast()
@@ -266,16 +272,25 @@ class CameraFragment : Fragment() {
             .build()
 
         // ImageCapture
-        imageCapture = ImageCapture.Builder()
-            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-            // We request aspect ratio but no resolution to match preview config, but letting
-            // CameraX optimize for whatever specific resolution best fits our use cases
-            .setTargetAspectRatio(screenAspectRatio)
-            // Set initial target rotation, we will have to call this again if rotation changes
-            // during the lifecycle of this use case
-            .setTargetRotation(rotation)
-            .setBufferFormat(ImageFormat.JPEG)
-            .build()
+        try {
+            imageCapture = ImageCapture.Builder()
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                // We request aspect ratio but no resolution to match preview config, but letting
+                // CameraX optimize for whatever specific resolution best fits our use cases
+                .setTargetAspectRatio(screenAspectRatio)
+                // Set initial target rotation, we will have to call this again if rotation changes
+                // during the lifecycle of this use case
+                .setTargetRotation(rotation)
+                .setFlashMode(FLASH_MODE_AUTO)
+                .setBufferFormat(imageCaptureFormat)
+                .build()
+        } catch (e: Exception) {
+            Toast.makeText(
+                requireActivity(),
+                "Image format unsupported", Toast.LENGTH_LONG
+            ).show()
+            Log.d(TAG, "bindCameraUseCases: imagecaptureformat error: ${e.localizedMessage}")
+        }
 
         // Must unbind the use-cases before rebinding them
         cameraProvider.unbindAll()
@@ -466,12 +481,12 @@ class CameraFragment : Fragment() {
                 bindCameraUseCases()
             }
         }
-
+        /*
         if (forceImageCapture) {
             cameraUiContainerBinding?.cameraCaptureButton?.visibility = View.VISIBLE
         } else {
             cameraUiContainerBinding?.cameraCaptureButton?.visibility = View.GONE
-        }
+        }*/
     }
 
     /** Enabled or disabled a button to switch cameras depending on the available cameras */

@@ -1,6 +1,7 @@
 package com.evolve.evolvecamera
 
 import android.content.Intent
+import android.graphics.ImageFormat
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
@@ -34,8 +35,12 @@ class MainActivity : AppCompatActivity() {
         picture = findViewById(R.id.image)
         val btnCamera: Button = findViewById(R.id.btnCamera)
         btnCamera.setOnClickListener {
-            EvolveImagePicker.with(this)
-                .start(evolveActivityResultLauncher)
+            EvolveImagePicker
+                .with(this)
+                .start(
+                    evolveActivityResultLauncher,
+                    forceImageCapture = false
+                    )
         }
     }
 
