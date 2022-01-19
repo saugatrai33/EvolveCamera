@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.ImageFormat
 import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Bundle
@@ -273,6 +274,7 @@ class CameraFragment : Fragment() {
             // Set initial target rotation, we will have to call this again if rotation changes
             // during the lifecycle of this use case
             .setTargetRotation(rotation)
+            .setBufferFormat(ImageFormat.JPEG)
             .build()
 
         // Must unbind the use-cases before rebinding them
