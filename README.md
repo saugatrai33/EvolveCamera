@@ -48,20 +48,17 @@ class MainActivity : AppCompatActivity() {
             .start(evolveActivityResultLauncher)
     }
     
-    ```
-	private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
+    private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
 		registerForActivityResult(
 		    ActivityResultContracts.StartActivityForResult()
-		) { result ->
-		    val data = result.data!!.data
-		    Log.d("MainActivity::", "result: ${data.toString()}")
-		    Glide.with(this)
-			.load(data)
-			.apply(RequestOptions.centerCropTransform())
-			.into(image)
-		}
-	```
-
+	) { result ->
+	    val data = result.data!!.data
+	    Log.d("MainActivity::", "result: ${data.toString()}")
+	    Glide.with(this)
+		.load(data)
+		.apply(RequestOptions.centerCropTransform())
+		.into(image)
+	}
 }
 ```
 
