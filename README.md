@@ -7,17 +7,18 @@ Initial release
 
 ## Install with Gradle
 
-'build.gradle' project level
-'''
+```build.grdle``` project level
+
+```
 allprojects {
 		repositories {
 			...
 			maven { url 'https://jitpack.io' }
 		}
 	}
-'''
+```
   
-In you build.gradle app level.
+```build.gradle``` app level
 ```
 implementation 'com.github.saugatrai33:EvolveCamera:2.0.6'
 ```
