@@ -1,9 +1,10 @@
 package com.evolve.cameralib
 
+import android.content.pm.ActivityInfo
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
 import androidx.core.view.WindowCompat
@@ -17,11 +18,18 @@ class EvolveCameraActivity : AppCompatActivity(),
     CameraXConfig.Provider {
 
     private lateinit var binding: ActivityEvolveCameraBinding
+    private val screenOrientation: Int by lazy {
+        intent?.extras?.getInt(
+            EvolveImagePicker.KEY_SCREEN_ORIENTATION,
+            ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+        )!!
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEvolveCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        requestedOrientation = screenOrientation
     }
 
     override fun getCameraXConfig(): CameraXConfig {

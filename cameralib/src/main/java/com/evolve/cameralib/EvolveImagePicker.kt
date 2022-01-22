@@ -2,6 +2,7 @@ package com.evolve.cameralib
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.ImageFormat
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
@@ -16,6 +17,7 @@ class EvolveImagePicker {
         const val KEY_CAMERA_CAPTURE_FORCE = "forceCameraCapture"
         const val KEY_FILENAME = "IMG_FILENAME"
         const val KEY_IMAGE_CAPTURE_FORMAT = "imageCaptureFormat"
+        const val KEY_SCREEN_ORIENTATION = "screenOrientation"
 
         /**
          * Use this to use EvolveImagePicker in Activity Class
@@ -49,14 +51,16 @@ class EvolveImagePicker {
             forceImageCapture: Boolean = true,
             enabledFrontCamera: Boolean = true,
             fileName: String = "",
-            imageCaptureFormat: Int = ImageFormat.JPEG
+            imageCaptureFormat: Int = ImageFormat.JPEG,
+            screenOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
         ) {
             startActivity(
                 launcher,
                 forceImageCapture,
                 enabledFrontCamera,
                 fileName,
-                imageCaptureFormat
+                imageCaptureFormat,
+                screenOrientation
             )
         }
 
@@ -65,7 +69,8 @@ class EvolveImagePicker {
             forceImageCapture: Boolean,
             enabledFrontCamera: Boolean,
             fileName: String,
-            imageCaptureFormat: Int
+            imageCaptureFormat: Int,
+            screenOrientation: Int
         ) {
             val imagePickerIntent: Intent = if (fragment != null) {
                 Intent(fragment?.requireActivity(), EvolveCameraActivity::class.java)
@@ -76,6 +81,7 @@ class EvolveImagePicker {
             imagePickerIntent.putExtra(KEY_FRONT_CAMERA, enabledFrontCamera)
             imagePickerIntent.putExtra(KEY_FILENAME, fileName)
             imagePickerIntent.putExtra(KEY_IMAGE_CAPTURE_FORMAT, imageCaptureFormat)
+            imagePickerIntent.putExtra(KEY_SCREEN_ORIENTATION, screenOrientation)
             launcher.launch(imagePickerIntent)
         }
     }
