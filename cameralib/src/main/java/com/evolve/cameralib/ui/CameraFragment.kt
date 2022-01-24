@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.camera.core.*
@@ -78,6 +79,9 @@ class CameraFragment : Fragment() {
             override fun onOrientationChanged(orientation: Int) {
                 println("AAA:: orientation: $orientation")
                 if (orientation == ORIENTATION_UNKNOWN) {
+                    enableCaptureBtn()
+                    showSuccessToast()
+                    readyBg()
                     return
                 }
                 deviceOrientation = orientation
@@ -135,7 +139,11 @@ class CameraFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentCameraBinding.inflate(inflater, container, false)
+        binding = FragmentCameraBinding.inflate(
+            inflater,
+            container,
+            false
+        )
         return binding!!.root
     }
 
@@ -210,6 +218,7 @@ class CameraFragment : Fragment() {
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+
         // Rebind the camera with the updated display metrics
         bindCameraUseCases()
 
@@ -418,10 +427,6 @@ class CameraFragment : Fragment() {
             binding!!.root,
             true
         )
-
-        // alter camera control position
-//        changeCameraControlPosition()
-
         cameraUiContainerBinding?.cameraCaptureButton?.setOnClickListener {
             // Get a stable reference of the modifiable image capture use case
             imageCapture?.let { imageCapture ->
@@ -470,7 +475,6 @@ class CameraFragment : Fragment() {
 
             // Disable the button until the camera is set up
             it.isEnabled = false
-
             it.setOnClickListener {
                 lensFacing = if (CameraSelector.LENS_FACING_FRONT == lensFacing) {
                     CameraSelector.LENS_FACING_BACK
@@ -531,101 +535,4 @@ class CameraFragment : Fragment() {
     private fun disableCaptureBtn() {
         cameraUiContainerBinding?.cameraCaptureButton?.isEnabled = false
     }
-
-    private fun changeCameraControlPosition() {
-        println("AAA:: device orientation: $deviceOrientation")
-        val cameraUIContainerView: ConstraintLayout =
-            cameraUiContainerBinding?.controlUIContainer as ConstraintLayout
-        val cameraControlView: ConstraintLayout =
-            cameraUiContainerBinding?.controlView as ConstraintLayout
-        val constraintSet = ConstraintSet()
-        constraintSet.clone(cameraUIContainerView)
-        when (deviceOrientation) {
-            in 0..10 -> {
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.START,
-                    cameraUIContainerView.id,
-                    ConstraintSet.START
-                )
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.BOTTOM,
-                    cameraUIContainerView.id,
-                    ConstraintSet.BOTTOM
-                )
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.END,
-                    cameraUIContainerView.id,
-                    ConstraintSet.END
-                )
-                constraintSet.applyTo(cameraUIContainerView)
-            }
-            in 85..95 -> {
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.START,
-                    cameraUIContainerView.id,
-                    ConstraintSet.START
-                )
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.BOTTOM,
-                    cameraUIContainerView.id,
-                    ConstraintSet.BOTTOM
-                )
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.TOP,
-                    cameraUIContainerView.id,
-                    ConstraintSet.TOP
-                )
-                constraintSet.applyTo(cameraUIContainerView)
-            }
-            in 175..185 -> {
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.START,
-                    cameraUIContainerView.id,
-                    ConstraintSet.START
-                )
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.TOP,
-                    cameraUIContainerView.id,
-                    ConstraintSet.TOP
-                )
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.END,
-                    cameraUIContainerView.id,
-                    ConstraintSet.END
-                )
-                constraintSet.applyTo(cameraControlView)
-            }
-            in 265..275 -> {
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.END,
-                    cameraUIContainerView.id,
-                    ConstraintSet.END
-                )
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.TOP,
-                    cameraUIContainerView.id,
-                    ConstraintSet.TOP
-                )
-                constraintSet.connect(
-                    cameraControlView.id,
-                    ConstraintSet.BOTTOM,
-                    cameraUIContainerView.id,
-                    ConstraintSet.BOTTOM
-                )
-                constraintSet.applyTo(cameraControlView)
-            }
-        }
-    }
-
 }

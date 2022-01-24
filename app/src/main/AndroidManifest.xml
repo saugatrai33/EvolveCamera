@@ -16,7 +16,7 @@
             android:exported="true"
             android:resizeableActivity="true"
             android:rotationAnimation="seamless"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="fullUser"
             tools:targetApi="O">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
