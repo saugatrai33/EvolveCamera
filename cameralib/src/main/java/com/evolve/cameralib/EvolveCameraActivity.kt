@@ -29,6 +29,11 @@ class EvolveCameraActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         binding = ActivityEvolveCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        try {
+            this.supportActionBar?.hide()
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+        }
         requestedOrientation = screenOrientation
     }
 

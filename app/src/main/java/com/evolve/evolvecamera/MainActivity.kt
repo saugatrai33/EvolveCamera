@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
                 .with(this)
                 .start(
                     evolveActivityResultLauncher,
-                    forceImageCapture = false // optional parameter
+                    forceImageCapture = true // optional parameter
                 )
         }
     }
