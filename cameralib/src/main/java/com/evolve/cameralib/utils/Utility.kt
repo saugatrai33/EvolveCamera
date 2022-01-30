@@ -16,19 +16,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-/** Use external media if it is available, our app's file directory otherwise */
-fun getOutputDirectory(context: Context): File {
-    val appContext = context.applicationContext
-    val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
-        File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() }
-    }
-    return if (mediaDir != null && mediaDir.exists())
-        mediaDir else appContext.filesDir
-}
-
 /**
- *  [androidx.camera.core.ImageAnalysis.Builder] requires enum value of
- *  [androidx.camera.core.AspectRatio]. Currently it has values of 4:3 & 16:9.
  *
  *  Detecting the most suitable ratio for dimensions provided in @params by counting absolute
  *  of preview ratio to one of the provided values.
@@ -55,21 +43,13 @@ fun hasFrontCamera(cameraProvider: ProcessCameraProvider): Boolean {
     return cameraProvider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)
 }
 
-/** Helper function used to create a timestamped file */
-fun createFile(baseFolder: File, format: String, extension: String) =
-    File(
-        baseFolder, SimpleDateFormat(format, Locale.US)
-            .format(System.currentTimeMillis()) + extension
-    )
-
 @Throws(IOException::class)
 fun createImageFile(context: Context, fileName: String): File {
-    // Create an image file name
     val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
     return File.createTempFile(
-        createFileName(fileName), /* prefix */
-        ".jpg", /* suffix */
-        storageDir /* directory */
+        createFileName(fileName),
+        ".jpg",
+        storageDir
     )
 }
 

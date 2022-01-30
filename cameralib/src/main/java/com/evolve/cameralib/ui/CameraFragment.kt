@@ -67,10 +67,12 @@ class CameraFragment : Fragment() {
         activity?.intent?.extras?.getString(KEY_FILENAME, "")!!
     }
     private val imageCaptureFormat: Int by lazy {
-        activity?.intent?.extras?.getInt(KEY_IMAGE_CAPTURE_FORMAT, ImageFormat.JPEG)!!
+        activity?.intent?.extras?.getInt(
+            KEY_IMAGE_CAPTURE_FORMAT,
+            ImageFormat.JPEG
+        )!!
     }
 
-    /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
 
     private val orientationEventListener by lazy {
@@ -78,11 +80,7 @@ class CameraFragment : Fragment() {
             requireContext()
         ) {
             override fun onOrientationChanged(orientation: Int) {
-                println("AAA:: orientation: $orientation")
                 if (orientation == ORIENTATION_UNKNOWN) {
-                    enableCaptureBtn()
-                    showSuccessToast()
-                    readyBg()
                     return
                 }
                 deviceOrientation = orientation
@@ -126,7 +124,6 @@ class CameraFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // OnBackPress callback
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 requireActivity().finish()
@@ -154,7 +151,6 @@ class CameraFragment : Fragment() {
             Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
                 CameraFragmentDirections.actionCameraFragmentToPermissionsFragment()
             )
-            return
         }
     }
 
@@ -162,8 +158,6 @@ class CameraFragment : Fragment() {
         binding = null
         cameraUiContainerBinding = null
         super.onDestroyView()
-
-        // Shut down our background executor
         cameraExecutor.shutdown()
     }
 
@@ -174,33 +168,19 @@ class CameraFragment : Fragment() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         windowManager = WindowManager(view.context)
 
-        // Wait for the views to be properly laid out
         binding!!.viewFinder.post {
-            // Build UI controls
             updateCameraUi()
-
-            // Set up the camera and its use cases
             setUpCamera()
         }
 
-        // Listen to tap events on the viewfinder and set them as focus regions
         binding!!.viewFinder.setOnTouchListener { _: View, motionEvent: MotionEvent ->
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> return@setOnTouchListener true
                 MotionEvent.ACTION_UP -> {
-                    // Get the MeteringPointFactory from PreviewView
                     val factory = binding!!.viewFinder.meteringPointFactory
-
-                    // Create a MeteringPoint from the tap coordinates
                     val point = factory.createPoint(motionEvent.x, motionEvent.y)
-
-                    // Create a MeteringAction from the MeteringPoint, you can configure it to specify the metering mode
                     val action = FocusMeteringAction.Builder(point).build()
-
-                    // Trigger the focus and metering. The method returns a ListenableFuture since the operation
-                    // is asynchronous. You can use it get notified when the focus is successful or if it fails.
                     camera!!.cameraControl.startFocusAndMetering(action)
-
                     return@setOnTouchListener true
                 }
                 else -> return@setOnTouchListener false
@@ -209,87 +189,42 @@ class CameraFragment : Fragment() {
 
     }
 
-    /**
-     * Inflate camera controls and update the UI manually upon config changes to avoid removing
-     * and re-adding the view finder from the view hierarchy; this provides a seamless rotation
-     * transition on devices that support it.
-     *
-     * NOTE: The flag is supported starting in Android 8 but there still is a small flash on the
-     * screen for devices that run Android 9 or below.
-     */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-
-        // Rebind the camera with the updated display metrics
         bindCameraUseCases()
-
-        // Enable or disable switching between cameras
         updateCameraSwitchButton()
-
         updateCameraUi()
     }
-    // endregion
 
-    // region Camera View code
-    /** Initialize CameraX, and prepare to bind the camera use cases  */
     private fun setUpCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener({
-
-            // CameraProvider
             cameraProvider = cameraProviderFuture.get()
-
-            // Select lensFacing depending on the available cameras
             lensFacing = when {
                 hasBackCamera(cameraProvider!!) -> CameraSelector.LENS_FACING_BACK
                 hasFrontCamera(cameraProvider!!) -> CameraSelector.LENS_FACING_FRONT
                 else -> throw IllegalStateException("Back and front camera are unavailable")
             }
-
-            // Enable or disable switching between cameras
             updateCameraSwitchButton()
-
-            // Build and bind the camera use cases
             bindCameraUseCases()
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
-    /** Declare and bind preview, capture and analysis use cases */
     private fun bindCameraUseCases() {
-
-        // Get screen metrics used to setup camera for full screen resolution
         val metrics = windowManager.getCurrentWindowMetrics().bounds
-        Log.d(TAG, "Screen metrics: ${metrics.width()} x ${metrics.height()}")
-
         val screenAspectRatio = aspectRatio(metrics.width(), metrics.height())
-        Log.d(TAG, "Preview aspect ratio: $screenAspectRatio")
-
         val rotation = binding!!.viewFinder.display.rotation
-
-        // CameraProvider
         val cameraProvider = cameraProvider
             ?: throw IllegalStateException("Camera initialization failed.")
-
-        // CameraSelector
         val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
-
-        // Preview
         preview = Preview.Builder()
-            // We request aspect ratio but no resolution
             .setTargetAspectRatio(screenAspectRatio)
-            // Set initial target rotation
             .setTargetRotation(rotation)
             .build()
-
-        // ImageCapture
         try {
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                // We request aspect ratio but no resolution to match preview config, but letting
-                // CameraX optimize for whatever specific resolution best fits our use cases
                 .setTargetAspectRatio(screenAspectRatio)
-                // Set initial target rotation, we will have to call this again if rotation changes
-                // during the lifecycle of this use case
                 .setTargetRotation(rotation)
                 .setFlashMode(FLASH_MODE_AUTO)
                 .setBufferFormat(imageCaptureFormat)
@@ -301,18 +236,11 @@ class CameraFragment : Fragment() {
             ).show()
             Log.d(TAG, "bindCameraUseCases: imagecaptureformat error: ${e.localizedMessage}")
         }
-
-        // Must unbind the use-cases before rebinding them
         cameraProvider.unbindAll()
-
         try {
-            // A variable number of use-cases can be passed here -
-            // camera provides access to CameraControl & CameraInfo
             camera = cameraProvider.bindToLifecycle(
                 this, cameraSelector, preview, imageCapture
             )
-
-            // Attach the viewfinder's surface provider to preview use case
             preview?.setSurfaceProvider(binding!!.viewFinder.surfaceProvider)
             observeCameraState(camera?.cameraInfo!!)
         } catch (exc: Exception) {
@@ -325,23 +253,18 @@ class CameraFragment : Fragment() {
             run {
                 when (cameraState.type) {
                     CameraState.Type.PENDING_OPEN -> {
-                        // Ask the user to close other camera apps
                         Log.d(TAG, "observeCameraState: CameraState: Pending Open")
                     }
                     CameraState.Type.OPENING -> {
-                        // Show the Camera UI
                         Log.d(TAG, "observeCameraState: CameraState: Opening")
                     }
                     CameraState.Type.OPEN -> {
-                        // Setup Camera resources and begin processing
                         Log.d(TAG, "observeCameraState: CameraState: Open")
                     }
                     CameraState.Type.CLOSING -> {
-                        // Close camera UI
                         Log.d(TAG, "observeCameraState: CameraState: Closing")
                     }
                     CameraState.Type.CLOSED -> {
-                        // Free camera resources
                         Log.d(TAG, "observeCameraState: CameraState: Closed")
                     }
                 }
@@ -349,104 +272,50 @@ class CameraFragment : Fragment() {
 
             cameraState.error?.let { error ->
                 when (error.code) {
-                    // Open errors
                     CameraState.ERROR_STREAM_CONFIG -> {
-                        // Make sure to setup the use cases properly
-                        Toast.makeText(
-                            context,
-                            "Stream config error",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        this.showToast("Stream config error")
                     }
-                    // Opening errors
                     CameraState.ERROR_CAMERA_IN_USE -> {
-                        // Close the camera or ask user to close another camera app that's using the
-                        // camera
-                        Toast.makeText(
-                            context,
-                            "Camera in use",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        this.showToast("Camera in use")
                     }
                     CameraState.ERROR_MAX_CAMERAS_IN_USE -> {
-                        // Close another open camera in the app, or ask the user to close another
-                        // camera app that's using the camera
-                        Toast.makeText(
-                            context,
-                            "Max cameras in use",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        this.showToast("Max cameras in use")
                     }
                     CameraState.ERROR_OTHER_RECOVERABLE_ERROR -> {
-                        Toast.makeText(
-                            context,
-                            "Other recoverable error",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        this.showToast("Other recoverable error")
                     }
-                    // Closing errors
                     CameraState.ERROR_CAMERA_DISABLED -> {
-                        // Ask the user to enable the device's cameras
-                        Toast.makeText(
-                            context,
-                            "Camera disabled",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        this.showToast("Camera disabled")
                     }
                     CameraState.ERROR_CAMERA_FATAL_ERROR -> {
-                        // Ask the user to reboot the device to restore camera function
-                        Toast.makeText(
-                            context,
-                            "Fatal error",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        this.showToast("Fatal error")
                     }
-                    // Closed errors
                     CameraState.ERROR_DO_NOT_DISTURB_MODE_ENABLED -> {
-                        // Ask the user to disable the "Do Not Disturb" mode, then reopen the camera
-                        Toast.makeText(
-                            context,
-                            "Do not disturb mode enabled",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        this.showToast("Do not disturb mode enabled")
                     }
                 }
             }
         }
     }
 
-    /** Method used to re-draw the camera UI controls, called every time configuration changes. */
     private fun updateCameraUi() {
-
-        // Remove previous UI if any
         cameraUiContainerBinding?.root?.let {
             binding!!.root.removeView(it)
         }
-
         cameraUiContainerBinding = CameraUiContainerBinding.inflate(
             LayoutInflater.from(requireContext()),
             binding!!.root,
             true
         )
         cameraUiContainerBinding?.cameraCaptureButton?.setOnClickListener {
-            // Get a stable reference of the modifiable image capture use case
             imageCapture?.let { imageCapture ->
-
-                // Create output file to hold the image
                 val photoFile = createImageFile(requireContext(), imgFileName)
-
-                // Setup image capture metadata
                 val metadata = ImageCapture.Metadata().apply {
-                    // Mirror image when using the front camera
                     isReversedHorizontal = lensFacing == CameraSelector.LENS_FACING_FRONT
                 }
-
-                // Create output options object which contains file + metadata
                 val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile)
                     .setMetadata(metadata)
                     .build()
-
-                // Setup image capture listener which is triggered after photo has been taken
                 imageCapture.takePicture(
                     outputOptions, cameraExecutor, object : ImageCapture.OnImageSavedCallback {
                         override fun onError(exc: ImageCaptureException) {
@@ -456,12 +325,6 @@ class CameraFragment : Fragment() {
                         override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                             val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
                             Log.d(TAG, "Photo capture succeeded: $savedUri")
-
-                            val exif = Exif.createFromFile(photoFile)
-                            val rotation = exif.rotation
-                            Log.d("EXIF::Rotation", "onImageSaved: rotation:: $rotation")
-                            println("AAA:: $rotation")
-
                             val intent = Intent()
                             intent.data = savedUri
                             requireActivity().setResult(Activity.RESULT_OK, intent)
@@ -471,10 +334,7 @@ class CameraFragment : Fragment() {
             }
         }
 
-        // Setup for button used to switch cameras
         cameraUiContainerBinding?.cameraSwitchButton?.let {
-
-            // Disable the button until the camera is set up
             it.isEnabled = false
             it.setOnClickListener {
                 lensFacing = if (CameraSelector.LENS_FACING_FRONT == lensFacing) {
@@ -482,19 +342,11 @@ class CameraFragment : Fragment() {
                 } else {
                     CameraSelector.LENS_FACING_FRONT
                 }
-                // Re-bind use cases to update selected camera
                 bindCameraUseCases()
             }
         }
-        /*
-        if (forceImageCapture) {
-            cameraUiContainerBinding?.cameraCaptureButton?.visibility = View.VISIBLE
-        } else {
-            cameraUiContainerBinding?.cameraCaptureButton?.visibility = View.GONE
-        }*/
     }
 
-    /** Enabled or disabled a button to switch cameras depending on the available cameras */
     private fun updateCameraSwitchButton() {
         try {
             cameraUiContainerBinding?.cameraSwitchButton?.isEnabled =

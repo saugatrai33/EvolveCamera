@@ -17,7 +17,6 @@ class EvolveImagePicker {
         const val KEY_CAMERA_CAPTURE_FORCE = "forceCameraCapture"
         const val KEY_FILENAME = "IMG_FILENAME"
         const val KEY_IMAGE_CAPTURE_FORMAT = "imageCaptureFormat"
-        const val KEY_SCREEN_ORIENTATION = "screenOrientation"
 
         /**
          * Use this to use EvolveImagePicker in Activity Class
@@ -51,8 +50,7 @@ class EvolveImagePicker {
             forceImageCapture: Boolean = true,
             enabledFrontCamera: Boolean = true,
             fileName: String = "",
-            imageCaptureFormat: Int = ImageFormat.JPEG,
-            screenOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+            imageCaptureFormat: Int = ImageFormat.JPEG
         ) {
             startActivity(
                 launcher,
@@ -60,7 +58,6 @@ class EvolveImagePicker {
                 enabledFrontCamera,
                 fileName,
                 imageCaptureFormat,
-                screenOrientation
             )
         }
 
@@ -70,7 +67,6 @@ class EvolveImagePicker {
             enabledFrontCamera: Boolean,
             fileName: String,
             imageCaptureFormat: Int,
-            screenOrientation: Int
         ) {
             val imagePickerIntent: Intent = if (fragment != null) {
                 Intent(fragment?.requireActivity(), EvolveCameraActivity::class.java)
@@ -81,7 +77,6 @@ class EvolveImagePicker {
             imagePickerIntent.putExtra(KEY_FRONT_CAMERA, enabledFrontCamera)
             imagePickerIntent.putExtra(KEY_FILENAME, fileName)
             imagePickerIntent.putExtra(KEY_IMAGE_CAPTURE_FORMAT, imageCaptureFormat)
-            imagePickerIntent.putExtra(KEY_SCREEN_ORIENTATION, screenOrientation)
             launcher.launch(imagePickerIntent)
         }
     }

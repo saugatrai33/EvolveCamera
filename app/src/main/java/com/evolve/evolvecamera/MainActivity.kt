@@ -35,12 +35,11 @@ class MainActivity : AppCompatActivity() {
         picture = findViewById(R.id.image)
         val btnCamera: Button = findViewById(R.id.btnCamera)
         btnCamera.setOnClickListener {
-            // launch camera
             EvolveImagePicker
                 .with(this)
                 .start(
                     evolveActivityResultLauncher,
-                    forceImageCapture = true // optional parameter
+                    forceImageCapture = true
                 )
         }
     }
