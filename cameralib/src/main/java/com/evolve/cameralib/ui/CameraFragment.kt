@@ -56,6 +56,8 @@ class CameraFragment : Fragment() {
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var windowManager: WindowManager
     private var deviceOrientation = OrientationEventListener.ORIENTATION_UNKNOWN
+    private var displayId: Int = -1
+    private lateinit var cameraExecutor: ExecutorService
 
     private val forceImageCapture: Boolean by lazy {
         activity?.intent?.extras?.getBoolean(KEY_CAMERA_CAPTURE_FORCE) == true
@@ -72,9 +74,6 @@ class CameraFragment : Fragment() {
             ImageFormat.JPEG
         )!!
     }
-
-    private lateinit var cameraExecutor: ExecutorService
-
     private val orientationEventListener by lazy {
         object : OrientationEventListener(
             requireContext()
@@ -110,6 +109,18 @@ class CameraFragment : Fragment() {
                 }
             }
         }
+    }
+    private val displayManager by lazy {
+        requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+    }
+    private val displayListener = object : DisplayManager.DisplayListener {
+        override fun onDisplayAdded(displayId: Int) = Unit
+        override fun onDisplayRemoved(displayId: Int) = Unit
+        override fun onDisplayChanged(displayId: Int) = view?.let { view ->
+            if (displayId == this@CameraFragment.displayId) {
+                imageCapture?.targetRotation = view.display.rotation
+            }
+        } ?: Unit
     }
 
     override fun onStart() {
@@ -159,6 +170,7 @@ class CameraFragment : Fragment() {
         cameraUiContainerBinding = null
         super.onDestroyView()
         cameraExecutor.shutdown()
+        displayManager.unregisterDisplayListener(displayListener)
     }
 
     @SuppressLint("MissingPermission", "ClickableViewAccessibility")
@@ -166,6 +178,7 @@ class CameraFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+        displayManager.registerDisplayListener(displayListener, null)
         windowManager = WindowManager(view.context)
 
         binding!!.viewFinder.post {
