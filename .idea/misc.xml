@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCamera/app/src/main/res/xml/provider_paths.xml" value="0.12613981762917933" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCamera/cameralib/src/main/res/layout-land/camera_ui_container.xml" value="0.18385416666666668" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCamera/cameralib/src/main/res/layout-land/layout_control_1.xml" value="0.21957671957671956" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCamera/cameralib/src/main/res/layout-sw600dp/camera_ui_container.xml" value="0.1260245901639344" />
