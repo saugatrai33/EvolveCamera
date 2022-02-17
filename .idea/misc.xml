@@ -35,6 +35,8 @@
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout/toast.xml" value="0.259375" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout/toast_success.xml" value="0.259375" />
         <entry key="..\:/Users/Saugat/AndroidStudioProjects/EvolveCameraX/cameraxlib/src/main/res/layout/toast_warning.xml" value="0.259375" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.14175724637681159" />
+        <entry key="cameralib/src/main/res/drawable/ic_shutter_ready.xml" value="0.1785" />
       </map>
     </option>
   </component>

@@ -46,8 +46,9 @@ class CameraFragment : Fragment() {
 
     private val TAG = CameraFragment::class.java.canonicalName
 
-    private var binding: FragmentCameraBinding? = null
     private var cameraUiContainerBinding: CameraUiContainerBinding? = null
+    private var _fragmentCameraBinding: FragmentCameraBinding? = null
+    private val fragmentCameraBinding get() = _fragmentCameraBinding!!
 
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private var preview: Preview? = null
@@ -148,12 +149,12 @@ class CameraFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentCameraBinding.inflate(
+        _fragmentCameraBinding = FragmentCameraBinding.inflate(
             inflater,
             container,
             false
         )
-        return binding!!.root
+        return fragmentCameraBinding.root
     }
 
     override fun onResume() {
@@ -166,7 +167,7 @@ class CameraFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        binding = null
+        _fragmentCameraBinding = null
         cameraUiContainerBinding = null
         super.onDestroyView()
         cameraExecutor.shutdown()
@@ -181,19 +182,19 @@ class CameraFragment : Fragment() {
         displayManager.registerDisplayListener(displayListener, null)
         windowManager = WindowManager(view.context)
 
-        binding!!.viewFinder.post {
+        fragmentCameraBinding.viewFinder.post {
             updateCameraUi()
             setUpCamera()
         }
 
-        binding!!.viewFinder.setOnTouchListener { _: View, motionEvent: MotionEvent ->
+        fragmentCameraBinding.viewFinder.setOnTouchListener { _: View, motionEvent: MotionEvent ->
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> return@setOnTouchListener true
                 MotionEvent.ACTION_UP -> {
-                    val factory = binding!!.viewFinder.meteringPointFactory
+                    val factory = fragmentCameraBinding.viewFinder.meteringPointFactory
                     val point = factory.createPoint(motionEvent.x, motionEvent.y)
                     val action = FocusMeteringAction.Builder(point).build()
-                    camera!!.cameraControl.startFocusAndMetering(action)
+                    camera?.cameraControl?.startFocusAndMetering(action)
                     return@setOnTouchListener true
                 }
                 else -> return@setOnTouchListener false
@@ -214,8 +215,8 @@ class CameraFragment : Fragment() {
         cameraProviderFuture.addListener({
             cameraProvider = cameraProviderFuture.get()
             lensFacing = when {
-                hasBackCamera(cameraProvider!!) -> CameraSelector.LENS_FACING_BACK
-                hasFrontCamera(cameraProvider!!) -> CameraSelector.LENS_FACING_FRONT
+                hasBackCamera(cameraProvider) -> CameraSelector.LENS_FACING_BACK
+                hasFrontCamera(cameraProvider) -> CameraSelector.LENS_FACING_FRONT
                 else -> throw IllegalStateException("Back and front camera are unavailable")
             }
             updateCameraSwitchButton()
@@ -226,7 +227,7 @@ class CameraFragment : Fragment() {
     private fun bindCameraUseCases() {
         val metrics = windowManager.getCurrentWindowMetrics().bounds
         val screenAspectRatio = aspectRatio(metrics.width(), metrics.height())
-        val rotation = binding!!.viewFinder.display.rotation
+        val rotation = fragmentCameraBinding.viewFinder.display.rotation
         val cameraProvider = cameraProvider
             ?: throw IllegalStateException("Camera initialization failed.")
         val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
@@ -252,17 +253,20 @@ class CameraFragment : Fragment() {
         cameraProvider.unbindAll()
         try {
             camera = cameraProvider.bindToLifecycle(
-                this, cameraSelector, preview, imageCapture
+                this,
+                cameraSelector,
+                preview,
+                imageCapture
             )
-            preview?.setSurfaceProvider(binding!!.viewFinder.surfaceProvider)
-            observeCameraState(camera?.cameraInfo!!)
+            preview?.setSurfaceProvider(fragmentCameraBinding.viewFinder.surfaceProvider)
+            observeCameraState(camera?.cameraInfo)
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
     }
 
-    private fun observeCameraState(cameraInfo: CameraInfo) {
-        cameraInfo.cameraState.observe(viewLifecycleOwner) { cameraState ->
+    private fun observeCameraState(cameraInfo: CameraInfo?) {
+        cameraInfo?.cameraState?.observe(viewLifecycleOwner) { cameraState ->
             run {
                 when (cameraState.type) {
                     CameraState.Type.PENDING_OPEN -> {
@@ -313,11 +317,11 @@ class CameraFragment : Fragment() {
 
     private fun updateCameraUi() {
         cameraUiContainerBinding?.root?.let {
-            binding!!.root.removeView(it)
+            fragmentCameraBinding.root.removeView(it)
         }
         cameraUiContainerBinding = CameraUiContainerBinding.inflate(
             LayoutInflater.from(requireContext()),
-            binding!!.root,
+            fragmentCameraBinding.root,
             true
         )
         cameraUiContainerBinding?.cameraCaptureButton?.setOnClickListener {
@@ -363,7 +367,7 @@ class CameraFragment : Fragment() {
     private fun updateCameraSwitchButton() {
         try {
             cameraUiContainerBinding?.cameraSwitchButton?.isEnabled =
-                hasBackCamera(cameraProvider!!) || hasFrontCamera(cameraProvider!!)
+                hasBackCamera(cameraProvider) || hasFrontCamera(cameraProvider)
 
             if (frontCameraEnable) {
                 cameraUiContainerBinding?.cameraSwitchButton?.visibility = View.VISIBLE

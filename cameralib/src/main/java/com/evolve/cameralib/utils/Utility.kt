@@ -34,13 +34,13 @@ fun aspectRatio(width: Int, height: Int): Int {
 }
 
 /** Returns true if the device has an available back camera. False otherwise */
-fun hasBackCamera(cameraProvider: ProcessCameraProvider): Boolean {
-    return cameraProvider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)
+fun hasBackCamera(cameraProvider: ProcessCameraProvider?): Boolean {
+    return cameraProvider?.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA) ?: false
 }
 
 /** Returns true if the device has an available front camera. False otherwise */
-fun hasFrontCamera(cameraProvider: ProcessCameraProvider): Boolean {
-    return cameraProvider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)
+fun hasFrontCamera(cameraProvider: ProcessCameraProvider?): Boolean {
+    return cameraProvider?.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA) ?: false
 }
 
 @Throws(IOException::class)
