@@ -16,12 +16,12 @@ private const val IMMERSIVE_FLAG_TIMEOUT = 500L
 class EvolveCameraActivity : AppCompatActivity(),
     CameraXConfig.Provider {
 
-    private lateinit var binding: ActivityEvolveCameraBinding
+    private var binding: ActivityEvolveCameraBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEvolveCameraBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(binding?.root)
         try {
             this.supportActionBar?.hide()
         } catch (e: NullPointerException) {
@@ -36,7 +36,7 @@ class EvolveCameraActivity : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
-        binding.fragmentContainer.postDelayed({
+        binding?.fragmentContainer?.postDelayed({
             hideSystemUI()
         }, IMMERSIVE_FLAG_TIMEOUT)
     }
@@ -52,11 +52,16 @@ class EvolveCameraActivity : AppCompatActivity(),
 
     private fun hideSystemUI() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, binding.fragmentContainer).let { controller ->
+        WindowInsetsControllerCompat(window, binding!!.fragmentContainer).let { controller ->
             controller.hide(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
     }
 
 }

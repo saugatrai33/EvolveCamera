@@ -45,11 +45,9 @@ import com.evolve.cameralib.EvolveImagePicker.Companion.KEY_IMAGE_CAPTURE_FORMAT
 class CameraFragment : Fragment() {
 
     private val TAG = CameraFragment::class.java.canonicalName
-
     private var cameraUiContainerBinding: CameraUiContainerBinding? = null
     private var _fragmentCameraBinding: FragmentCameraBinding? = null
     private val fragmentCameraBinding get() = _fragmentCameraBinding!!
-
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private var preview: Preview? = null
     private var imageCapture: ImageCapture? = null
@@ -59,7 +57,6 @@ class CameraFragment : Fragment() {
     private var deviceOrientation = OrientationEventListener.ORIENTATION_UNKNOWN
     private var displayId: Int = -1
     private lateinit var cameraExecutor: ExecutorService
-
     private val forceImageCapture: Boolean by lazy {
         activity?.intent?.extras?.getBoolean(KEY_CAMERA_CAPTURE_FORCE) == true
     }
