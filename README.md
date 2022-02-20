@@ -1,5 +1,3 @@
-# EvolveCameraX
-
 Simple camera app for android using camerax lib.
 
 ## Install with Gradle
