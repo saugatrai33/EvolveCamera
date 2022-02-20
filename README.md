@@ -1,4 +1,6 @@
 Simple camera app for android using camerax lib.
+![1](https://user-images.githubusercontent.com/22369188/154834456-44027ee4-20e0-42cc-a7f4-1563cc7abea4.png)
+![2](https://user-images.githubusercontent.com/22369188/154834460-f815b054-ed52-474b-84c6-ed53698380cb.png)
 
 ## Install with Gradle
 
