@@ -12,11 +12,8 @@
         android:theme="@style/Theme.EvolveCameraX">
         <activity
             android:name="com.evolve.evolvecamera.MainActivity"
-            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"
             android:exported="true"
-            android:resizeableActivity="true"
-            android:rotationAnimation="seamless"
-            android:screenOrientation="fullUser"
+            android:screenOrientation="portrait"
             tools:targetApi="O">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

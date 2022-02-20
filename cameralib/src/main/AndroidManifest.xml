@@ -12,12 +12,9 @@
     <application>
         <activity
             android:name="com.evolve.cameralib.EvolveCameraActivity"
-            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"
             android:exported="true"
             android:hardwareAccelerated="true"
-            android:resizeableActivity="true"
-            android:rotationAnimation="seamless"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             tools:targetApi="O">
 
             <!-- Declare notch support -->

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.ImageFormat
+import android.hardware.SensorManager
 import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Bundle
@@ -46,8 +47,7 @@ class CameraFragment : Fragment() {
 
     private val TAG = CameraFragment::class.java.canonicalName
     private var cameraUiContainerBinding: CameraUiContainerBinding? = null
-    private var _fragmentCameraBinding: FragmentCameraBinding? = null
-    private val fragmentCameraBinding get() = _fragmentCameraBinding!!
+    private lateinit var fragmentCameraBinding: FragmentCameraBinding
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private var preview: Preview? = null
     private var imageCapture: ImageCapture? = null
@@ -64,17 +64,18 @@ class CameraFragment : Fragment() {
         activity?.intent?.extras?.getBoolean(KEY_FRONT_CAMERA) == true
     }
     private val imgFileName: String by lazy {
-        activity?.intent?.extras?.getString(KEY_FILENAME, "")!!
+        activity?.intent?.extras?.getString(KEY_FILENAME, "") ?: ""
     }
     private val imageCaptureFormat: Int by lazy {
         activity?.intent?.extras?.getInt(
             KEY_IMAGE_CAPTURE_FORMAT,
             ImageFormat.JPEG
-        )!!
+        ) ?: 0
     }
     private val orientationEventListener by lazy {
         object : OrientationEventListener(
-            requireContext()
+            requireContext(),
+            SensorManager.SENSOR_DELAY_NORMAL
         ) {
             override fun onOrientationChanged(orientation: Int) {
                 if (orientation == ORIENTATION_UNKNOWN) {
@@ -146,7 +147,7 @@ class CameraFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _fragmentCameraBinding = FragmentCameraBinding.inflate(
+        fragmentCameraBinding = FragmentCameraBinding.inflate(
             inflater,
             container,
             false
@@ -164,7 +165,6 @@ class CameraFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        _fragmentCameraBinding = null
         cameraUiContainerBinding = null
         super.onDestroyView()
         cameraExecutor.shutdown()
@@ -198,13 +198,6 @@ class CameraFragment : Fragment() {
             }
         }
 
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        bindCameraUseCases()
-        updateCameraSwitchButton()
-        updateCameraUi()
     }
 
     private fun setUpCamera() {

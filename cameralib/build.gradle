@@ -96,7 +96,7 @@ afterEvaluate {
 
                 groupId = 'com.github.saugatrai33'
                 artifactId = 'evolve-camerax'
-                version = '3.0.1'
+                version = '3.0.9'
             }
         }
     }
