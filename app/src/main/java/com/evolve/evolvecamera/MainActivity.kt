@@ -10,10 +10,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import com.bumptech.glide.Glide
 import com.evolve.cameralib.EvolveImagePicker
-import com.squareup.picasso.Picasso
 import java.io.File
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -60,8 +59,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showImage() {
-        Picasso.get()
+        Glide.with(this)
             .load(imageUri)
+            .placeholder(R.drawable.ic_photo)
             .into(picture)
     }
 }
