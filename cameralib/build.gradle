@@ -30,7 +30,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
     buildFeatures {
         viewBinding = true
@@ -52,7 +52,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.10"
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.10"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
@@ -96,7 +96,7 @@ afterEvaluate {
 
                 groupId = 'com.github.saugatrai33'
                 artifactId = 'evolve-camerax'
-                version = '3.0.9'
+                version = '4.0.1'
             }
         }
     }
