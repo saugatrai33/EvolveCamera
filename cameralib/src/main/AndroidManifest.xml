@@ -3,10 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.evolve.cameralib">
 
-    <!-- Declare features -->
     <uses-feature android:name="android.hardware.camera" />
-
-    <!-- Declare permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application>
@@ -16,12 +13,19 @@
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"
             tools:targetApi="O">
-
-            <!-- Declare notch support -->
             <meta-data
                 android:name="android.notch_support"
                 android:value="true" />
         </activity>
+        <provider
+            android:authorities="${applicationId}.provider"
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
     </application>
 
 </manifest>

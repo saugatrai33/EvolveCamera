@@ -9,24 +9,21 @@ import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.evolve.cameralib.EvolveImagePicker
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var picture: ImageView
-    private var imageUri: Uri? = null
+    private var photoUri: Uri? = null
 
     private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            val photoUri: Uri? = result.data?.data
-            if (photoUri != null) {
-                imageUri = photoUri
-                showImage()
+            photoUri = result.data?.data
+            photoUri?.let {
+                showImage(it)
             }
         }
 
@@ -44,23 +41,20 @@ class MainActivity : AppCompatActivity() {
                 )
         }
         picture.setOnClickListener {
-            val photoURI = FileProvider.getUriForFile(
-                this,
-                this.applicationContext.packageName.toString() + ".provider",
-                File(imageUri!!.path)
-            )
-            val photoIntent = Intent(ACTION_VIEW, photoURI)
-            photoIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            photoIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            startActivity(
-                photoIntent
-            )
+            photoUri?.let {
+                val photoIntent = Intent(ACTION_VIEW, it)
+                photoIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                photoIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                startActivity(
+                    photoIntent
+                )
+            }
         }
     }
 
-    private fun showImage() {
+    private fun showImage(uri: Uri) {
         Glide.with(this)
-            .load(imageUri)
+            .load(uri)
             .placeholder(R.drawable.ic_photo)
             .into(picture)
     }

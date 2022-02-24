@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
-import android.content.res.Configuration
 import android.graphics.ImageFormat
 import android.hardware.SensorManager
 import android.hardware.display.DisplayManager
@@ -13,15 +11,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
-import androidx.camera.core.impl.utils.Exif
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
@@ -30,7 +24,6 @@ import com.evolve.cameralib.R
 import com.evolve.cameralib.databinding.CameraUiContainerBinding
 import com.evolve.cameralib.databinding.FragmentCameraBinding
 import com.evolve.cameralib.utils.*
-import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import com.evolve.cameralib.EvolveImagePicker.Companion.KEY_CAMERA_CAPTURE_FORCE
