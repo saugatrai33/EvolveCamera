@@ -9,16 +9,12 @@ import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
+import com.bumptech.glide.Glide
 import com.evolve.cameralib.EvolveImagePicker
-import com.squareup.picasso.Picasso
-import java.io.File
-
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var picture: ImageView
-
     private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -45,8 +41,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showImage(uri: Uri) {
-        Picasso.get()
+        Glide.with(this)
             .load(uri)
+            .placeholder(R.drawable.ic_photo)
             .into(picture)
     }
 }
