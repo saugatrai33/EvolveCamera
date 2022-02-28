@@ -18,16 +18,14 @@ import java.io.File
 class MainActivity : AppCompatActivity() {
 
     private lateinit var picture: ImageView
-    private var imageUri: Uri? = null
 
     private val evolveActivityResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             val photoUri: Uri? = result.data?.data
-            if (photoUri != null) {
-                imageUri = photoUri
-                showImage()
+            photoUri?.let {
+                showImage(it)
             }
         }
 
@@ -44,24 +42,11 @@ class MainActivity : AppCompatActivity() {
                     forceImageCapture = true
                 )
         }
-        picture.setOnClickListener {
-            val photoURI = FileProvider.getUriForFile(
-                this,
-                this.applicationContext.packageName.toString() + ".provider",
-                File(imageUri!!.path)
-            )
-            val photoIntent = Intent(ACTION_VIEW, photoURI)
-            photoIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            photoIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            startActivity(
-                photoIntent
-            )
-        }
     }
 
-    private fun showImage() {
+    private fun showImage(uri: Uri) {
         Picasso.get()
-            .load(imageUri)
+            .load(uri)
             .into(picture)
     }
 }
