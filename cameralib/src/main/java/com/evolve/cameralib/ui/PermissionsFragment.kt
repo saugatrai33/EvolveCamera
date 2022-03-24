@@ -40,7 +40,9 @@ class PermissionsFragment : Fragment() {
                     )
                         .show()
                     activity?.finish()
+                    return@registerForActivityResult
                 }
+                requestPermission()
             }
         }
 
