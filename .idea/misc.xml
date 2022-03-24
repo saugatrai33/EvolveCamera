@@ -39,12 +39,14 @@
         <entry key="cameralib/src/main/res/drawable/circle.xml" value="0.1785" />
         <entry key="cameralib/src/main/res/drawable/ic_shutter_ready.xml" value="0.1785" />
         <entry key="cameralib/src/main/res/layout-land/camera_ui_container.xml" value="0.16302083333333334" />
+        <entry key="cameralib/src/main/res/layout/activity_evolve_camera.xml" value="0.11730072463768115" />
         <entry key="cameralib/src/main/res/layout/camera_ui_container.xml" value="0.14175724637681159" />
         <entry key="cameralib/src/main/res/layout/fragment_camera.xml" value="0.14175724637681159" />
+        <entry key="cameralib/src/main/res/layout/fragment_permission.xml" value="0.14175724637681159" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

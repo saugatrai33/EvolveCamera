@@ -1,41 +1,66 @@
 package com.evolve.cameralib.ui
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.evolve.cameralib.R
 
-private const val PERMISSIONS_REQUEST_CODE = 10
 private val PERMISSIONS_REQUIRED = arrayOf(Manifest.permission.CAMERA)
 
 class PermissionsFragment : Fragment() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
-        if (!hasPermissions(requireContext())) {
-            requestPermissions(PERMISSIONS_REQUIRED, PERMISSIONS_REQUEST_CODE)
-        } else {
-            navigateToCamera()
-        }
-    }
+    var deniedCount = 0
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSIONS_REQUEST_CODE) {
-            if (PackageManager.PERMISSION_GRANTED == grantResults.firstOrNull()) {
-                Toast.makeText(context, "Permission request granted", Toast.LENGTH_LONG).show()
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
                 navigateToCamera()
             } else {
-                Toast.makeText(context, "Permission request denied", Toast.LENGTH_LONG).show()
+                deniedCount++
+                if (deniedCount > 2) {
+                    Toast.makeText(
+                        requireActivity(),
+                        "Permanently permission denied.Open camera again.",
+                        Toast.LENGTH_LONG
+                    )
+                        .show()
+                    activity?.finish()
+                }
             }
+        }
+
+    private val launcher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            if (!hasPermissions(requireActivity())) {
+                permanentPermissionRationale()
+            } else {
+                navigateToCamera()
+            }
+        }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (!hasPermissions(requireActivity())) {
+            checkCameraPermission()
+        } else {
+            navigateToCamera()
         }
     }
 
@@ -47,9 +72,45 @@ class PermissionsFragment : Fragment() {
         }
     }
 
-    companion object {
+    private fun checkCameraPermission() {
+        when (PackageManager.PERMISSION_GRANTED) {
+            ContextCompat.checkSelfPermission(
+                requireActivity(),
+                PERMISSIONS_REQUIRED[0]
+            ) -> {
+                navigateToCamera()
+            }
+            else -> {
+                requestPermission()
+            }
+        }
+    }
 
-        /** Convenience method used to check if all permissions required by this app are granted */
+    private fun requestPermission() {
+        requestPermissionLauncher.launch(
+            PERMISSIONS_REQUIRED[0]
+        )
+    }
+
+    private fun permanentPermissionRationale() {
+        AlertDialog.Builder(requireActivity())
+            .setTitle("Permission Denied")
+            .setMessage("Camera permission required to take picture.")
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri: Uri = Uri.fromParts(
+                    "package",
+                    requireActivity().packageName,
+                    PermissionsFragment::class.java.canonicalName
+                )
+                intent.data = uri
+                requestPermission()
+            }
+            .show()
+    }
+
+    companion object {
         fun hasPermissions(context: Context) = PERMISSIONS_REQUIRED.all {
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
