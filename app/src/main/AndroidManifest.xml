@@ -13,7 +13,7 @@
         <activity
             android:name="com.evolve.evolvecamera.MainActivity"
             android:exported="true"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="fullUser"
             tools:targetApi="O">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

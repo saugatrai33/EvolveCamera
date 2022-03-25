@@ -8,7 +8,7 @@
 
     <application>
         <activity
-            android:name="com.evolve.cameralib.EvolveCameraActivity"
+            android:name=".ui.EvolveCameraActivity"
             android:exported="true"
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"

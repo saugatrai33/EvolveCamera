@@ -40,16 +40,6 @@ class MainActivity : AppCompatActivity() {
                     forceImageCapture = true
                 )
         }
-        picture.setOnClickListener {
-            photoUri?.let {
-                val photoIntent = Intent(ACTION_VIEW, it)
-                photoIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                photoIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                startActivity(
-                    photoIntent
-                )
-            }
-        }
     }
 
     private fun showImage(uri: Uri) {

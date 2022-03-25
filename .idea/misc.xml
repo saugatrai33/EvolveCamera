@@ -39,6 +39,7 @@
         <entry key="cameralib/src/main/res/drawable/circle.xml" value="0.1785" />
         <entry key="cameralib/src/main/res/drawable/ic_shutter_ready.xml" value="0.1785" />
         <entry key="cameralib/src/main/res/layout-land/camera_ui_container.xml" value="0.16302083333333334" />
+        <entry key="cameralib/src/main/res/layout/activity_cam_evolve.xml" value="0.1953125" />
         <entry key="cameralib/src/main/res/layout/activity_evolve_camera.xml" value="0.11730072463768115" />
         <entry key="cameralib/src/main/res/layout/camera_ui_container.xml" value="0.14175724637681159" />
         <entry key="cameralib/src/main/res/layout/fragment_camera.xml" value="0.14175724637681159" />

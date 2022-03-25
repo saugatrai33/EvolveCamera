@@ -1,4 +1,4 @@
-package com.evolve.cameralib
+package com.evolve.cameralib.ui
 
 import android.os.Build
 import android.os.Bundle
@@ -36,9 +36,13 @@ class EvolveCameraActivity : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
-        binding?.fragmentContainer?.postDelayed({
-            hideSystemUI()
-        }, IMMERSIVE_FLAG_TIMEOUT)
+        try {
+            binding?.fragmentContainer?.postDelayed({
+                hideSystemUI()
+            }, IMMERSIVE_FLAG_TIMEOUT)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onBackPressed() {
@@ -60,8 +64,8 @@ class EvolveCameraActivity : AppCompatActivity(),
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         binding = null
+        super.onDestroy()
     }
 
 }

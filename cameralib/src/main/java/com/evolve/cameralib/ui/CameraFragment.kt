@@ -148,15 +148,6 @@ class CameraFragment : Fragment() {
         return fragmentCameraBinding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (!PermissionsFragment.hasPermissions(requireContext())) {
-            Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
-                CameraFragmentDirections.actionCameraFragmentToPermissionsFragment()
-            )
-        }
-    }
-
     override fun onDestroyView() {
         cameraUiContainerBinding = null
         super.onDestroyView()
