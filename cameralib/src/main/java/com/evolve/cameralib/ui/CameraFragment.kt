@@ -18,6 +18,7 @@ import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.window.layout.WindowMetrics
 import androidx.window.layout.WindowMetricsCalculator
 import com.evolve.cameralib.R
 import com.evolve.cameralib.databinding.CameraUiContainerBinding
@@ -112,6 +113,7 @@ class CameraFragment : Fragment() {
             }
         } ?: Unit
     }
+    private lateinit var windowMetrics: WindowMetrics
 
     override fun onStart() {
         super.onStart()
@@ -158,6 +160,9 @@ class CameraFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+        windowMetrics = WindowMetricsCalculator.getOrCreate()
+            .computeCurrentWindowMetrics(requireActivity())
+
         displayManager.registerDisplayListener(displayListener, null)
         fragmentCameraBinding.viewFinder.post {
             updateCameraUi()
@@ -195,8 +200,6 @@ class CameraFragment : Fragment() {
     }
 
     private fun bindCameraUseCases() {
-        val windowMetrics = WindowMetricsCalculator.getOrCreate()
-            .computeCurrentWindowMetrics(requireActivity())
         val screenAspectRatio =
             aspectRatio(windowMetrics.bounds.width(), windowMetrics.bounds.height())
         val rotation = fragmentCameraBinding.viewFinder.display.rotation

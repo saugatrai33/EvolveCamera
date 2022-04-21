@@ -90,8 +90,8 @@ afterEvaluate {
                 from components.release
 
                 groupId = 'com.github.saugatrai33'
-                artifactId = 'evolve-camerax'
-                version = '4.0.7'
+                artifactId = 'evolve-camera'
+                version = '4.1.5'
             }
         }
     }
