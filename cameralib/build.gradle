@@ -70,7 +70,7 @@ dependencies {
     implementation 'androidx.camera:camera-view:1.0.0-alpha32'
 
     //WindowManager
-    implementation 'androidx.window:window:1.0.0-alpha09'
+    implementation 'androidx.window:window:1.0.0'
 
     // Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'

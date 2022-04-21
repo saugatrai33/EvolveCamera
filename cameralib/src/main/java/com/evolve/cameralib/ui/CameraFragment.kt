@@ -18,8 +18,7 @@ import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
-import androidx.window.WindowManager
+import androidx.window.layout.WindowMetricsCalculator
 import com.evolve.cameralib.R
 import com.evolve.cameralib.databinding.CameraUiContainerBinding
 import com.evolve.cameralib.databinding.FragmentCameraBinding
@@ -46,7 +45,6 @@ class CameraFragment : Fragment() {
     private var imageCapture: ImageCapture? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
-    private lateinit var windowManager: WindowManager
     private var deviceOrientation = OrientationEventListener.ORIENTATION_UNKNOWN
     private var displayId: Int = -1
     private lateinit var cameraExecutor: ExecutorService
@@ -161,8 +159,6 @@ class CameraFragment : Fragment() {
 
         cameraExecutor = Executors.newSingleThreadExecutor()
         displayManager.registerDisplayListener(displayListener, null)
-        windowManager = WindowManager(view.context)
-
         fragmentCameraBinding.viewFinder.post {
             updateCameraUi()
             setUpCamera()
@@ -199,8 +195,10 @@ class CameraFragment : Fragment() {
     }
 
     private fun bindCameraUseCases() {
-        val metrics = windowManager.getCurrentWindowMetrics().bounds
-        val screenAspectRatio = aspectRatio(metrics.width(), metrics.height())
+        val windowMetrics = WindowMetricsCalculator.getOrCreate()
+            .computeCurrentWindowMetrics(requireActivity())
+        val screenAspectRatio =
+            aspectRatio(windowMetrics.bounds.width(), windowMetrics.bounds.height())
         val rotation = fragmentCameraBinding.viewFinder.display.rotation
         val cameraProvider = cameraProvider
             ?: throw IllegalStateException("Camera initialization failed.")
