@@ -2,7 +2,6 @@ package com.evolve.cameralib
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.ImageFormat
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import com.evolve.cameralib.ui.EvolveCameraActivity
@@ -49,15 +48,13 @@ class EvolveImagePicker {
             launcher: ActivityResultLauncher<Intent>,
             forceImageCapture: Boolean = true,
             enabledFrontCamera: Boolean = true,
-            fileName: String = "",
-            imageCaptureFormat: Int = ImageFormat.JPEG
+            fileName: String = ""
         ) {
             startActivity(
                 launcher,
                 forceImageCapture,
                 enabledFrontCamera,
-                fileName,
-                imageCaptureFormat,
+                fileName
             )
         }
 
@@ -66,7 +63,6 @@ class EvolveImagePicker {
             forceImageCapture: Boolean,
             enabledFrontCamera: Boolean,
             fileName: String,
-            imageCaptureFormat: Int,
         ) {
             val imagePickerIntent: Intent = if (fragment != null) {
                 Intent(fragment?.requireActivity(), EvolveCameraActivity::class.java)
@@ -76,7 +72,6 @@ class EvolveImagePicker {
             imagePickerIntent.putExtra(KEY_CAMERA_CAPTURE_FORCE, forceImageCapture)
             imagePickerIntent.putExtra(KEY_FRONT_CAMERA, enabledFrontCamera)
             imagePickerIntent.putExtra(KEY_FILENAME, fileName)
-            imagePickerIntent.putExtra(KEY_IMAGE_CAPTURE_FORMAT, imageCaptureFormat)
             launcher.launch(imagePickerIntent)
         }
     }

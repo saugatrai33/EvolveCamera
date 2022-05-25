@@ -9,4 +9,4 @@
     android:keepScreenOn="true"
     app:defaultNavHost="true"
     app:navGraph="@navigation/nav_graph"
-    tools:context=".EvolveCameraActivity" />
+    tools:context=".ui.EvolveCameraActivity" />
