@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.ImageFormat
 import android.hardware.SensorManager
 import android.hardware.display.DisplayManager
 import android.net.Uri
@@ -14,12 +13,11 @@ import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.camera.core.*
-import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
-import androidx.window.WindowManager
+import androidx.window.layout.WindowMetrics
+import androidx.window.layout.WindowMetricsCalculator
 import com.evolve.cameralib.R
 import com.evolve.cameralib.databinding.CameraUiContainerBinding
 import com.evolve.cameralib.databinding.FragmentCameraBinding
@@ -29,7 +27,6 @@ import java.util.concurrent.Executors
 import com.evolve.cameralib.EvolveImagePicker.Companion.KEY_CAMERA_CAPTURE_FORCE
 import com.evolve.cameralib.EvolveImagePicker.Companion.KEY_FILENAME
 import com.evolve.cameralib.EvolveImagePicker.Companion.KEY_FRONT_CAMERA
-import com.evolve.cameralib.EvolveImagePicker.Companion.KEY_IMAGE_CAPTURE_FORMAT
 
 /**
  * Main fragment for this app. Implements all camera operations including:
@@ -46,25 +43,22 @@ class CameraFragment : Fragment() {
     private var imageCapture: ImageCapture? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
-    private lateinit var windowManager: WindowManager
     private var deviceOrientation = OrientationEventListener.ORIENTATION_UNKNOWN
     private var displayId: Int = -1
     private lateinit var cameraExecutor: ExecutorService
+
     private val forceImageCapture: Boolean by lazy {
         activity?.intent?.extras?.getBoolean(KEY_CAMERA_CAPTURE_FORCE) == true
     }
+
     private val frontCameraEnable: Boolean by lazy {
         activity?.intent?.extras?.getBoolean(KEY_FRONT_CAMERA) == true
     }
+
     private val imgFileName: String by lazy {
         activity?.intent?.extras?.getString(KEY_FILENAME, "") ?: ""
     }
-    private val imageCaptureFormat: Int by lazy {
-        activity?.intent?.extras?.getInt(
-            KEY_IMAGE_CAPTURE_FORMAT,
-            ImageFormat.JPEG
-        ) ?: 0
-    }
+
     private val orientationEventListener by lazy {
         object : OrientationEventListener(
             requireContext(),
@@ -102,9 +96,11 @@ class CameraFragment : Fragment() {
             }
         }
     }
+
     private val displayManager by lazy {
         requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
     }
+
     private val displayListener = object : DisplayManager.DisplayListener {
         override fun onDisplayAdded(displayId: Int) = Unit
         override fun onDisplayRemoved(displayId: Int) = Unit
@@ -114,6 +110,8 @@ class CameraFragment : Fragment() {
             }
         } ?: Unit
     }
+
+    private lateinit var windowMetrics: WindowMetrics
 
     override fun onStart() {
         super.onStart()
@@ -140,11 +138,16 @@ class CameraFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         fragmentCameraBinding = FragmentCameraBinding.inflate(
             inflater,
             container,
             false
         )
+
+        windowMetrics = WindowMetricsCalculator.getOrCreate()
+            .computeCurrentWindowMetrics(requireActivity())
+
         return fragmentCameraBinding.root
     }
 
@@ -160,9 +163,8 @@ class CameraFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-        displayManager.registerDisplayListener(displayListener, null)
-        windowManager = WindowManager(view.context)
 
+        displayManager.registerDisplayListener(displayListener, null)
         fragmentCameraBinding.viewFinder.post {
             updateCameraUi()
             setUpCamera()
@@ -172,10 +174,14 @@ class CameraFragment : Fragment() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> return@setOnTouchListener true
                 MotionEvent.ACTION_UP -> {
-                    val factory = fragmentCameraBinding.viewFinder.meteringPointFactory
-                    val point = factory.createPoint(motionEvent.x, motionEvent.y)
-                    val action = FocusMeteringAction.Builder(point).build()
-                    camera?.cameraControl?.startFocusAndMetering(action)
+                    try {
+                        val factory = fragmentCameraBinding.viewFinder.meteringPointFactory
+                        val point = factory.createPoint(motionEvent.x, motionEvent.y)
+                        val action = FocusMeteringAction.Builder(point).build()
+                        camera?.cameraControl?.startFocusAndMetering(action)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                     return@setOnTouchListener true
                 }
                 else -> return@setOnTouchListener false
@@ -199,8 +205,8 @@ class CameraFragment : Fragment() {
     }
 
     private fun bindCameraUseCases() {
-        val metrics = windowManager.getCurrentWindowMetrics().bounds
-        val screenAspectRatio = aspectRatio(metrics.width(), metrics.height())
+        val screenAspectRatio =
+            aspectRatio(windowMetrics.bounds.width(), windowMetrics.bounds.height())
         val rotation = fragmentCameraBinding.viewFinder.display.rotation
         val cameraProvider = cameraProvider
             ?: throw IllegalStateException("Camera initialization failed.")
@@ -214,8 +220,6 @@ class CameraFragment : Fragment() {
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .setTargetAspectRatio(screenAspectRatio)
                 .setTargetRotation(rotation)
-                .setFlashMode(FLASH_MODE_AUTO)
-                .setBufferFormat(imageCaptureFormat)
                 .build()
         } catch (e: Exception) {
             Toast.makeText(
