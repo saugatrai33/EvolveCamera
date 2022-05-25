@@ -13,6 +13,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.camera.core.*
+import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -220,6 +221,7 @@ class CameraFragment : Fragment() {
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .setTargetAspectRatio(screenAspectRatio)
                 .setTargetRotation(rotation)
+                .setFlashMode(FLASH_MODE_AUTO)
                 .build()
         } catch (e: Exception) {
             Toast.makeText(
@@ -356,7 +358,6 @@ class CameraFragment : Fragment() {
             cameraUiContainerBinding?.cameraSwitchButton?.isEnabled = false
         }
     }
-    // endregion
 
     private fun showSuccessToast() {
         cameraUiContainerBinding?.warningView?.layoutWarning?.visibility = View.GONE
