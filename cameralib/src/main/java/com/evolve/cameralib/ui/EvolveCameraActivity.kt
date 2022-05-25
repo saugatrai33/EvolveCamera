@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.*
@@ -20,15 +19,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import androidx.window.layout.WindowMetrics
 import androidx.window.layout.WindowMetricsCalculator
 import com.evolve.cameralib.EvolveImagePicker
 import com.evolve.cameralib.R
 import com.evolve.cameralib.databinding.ActivityEvolveCameraBinding
 import com.evolve.cameralib.databinding.CameraUiContainerBinding
-import com.evolve.cameralib.databinding.FragmentCameraBinding
 import com.evolve.cameralib.utils.*
 import com.evolve.cameralib.utils.showToast
 import com.permissionx.guolindev.PermissionX
