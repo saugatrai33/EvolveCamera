@@ -15,7 +15,6 @@ class EvolveImagePicker {
         const val KEY_FRONT_CAMERA = "frontCamera"
         const val KEY_CAMERA_CAPTURE_FORCE = "forceCameraCapture"
         const val KEY_FILENAME = "IMG_FILENAME"
-        const val KEY_IMAGE_CAPTURE_FORMAT = "imageCaptureFormat"
 
         /**
          * Use this to use EvolveImagePicker in Activity Class
