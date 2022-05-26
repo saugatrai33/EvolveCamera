@@ -51,15 +51,15 @@ class EvolveCameraActivity : AppCompatActivity(),
     private lateinit var cameraExecutor: ExecutorService
 
     private val forceImageCapture: Boolean by lazy {
-        intent?.extras?.getBoolean(EvolveImagePicker.KEY_CAMERA_CAPTURE_FORCE) == true
+        intent.getBooleanExtra(EvolveImagePicker.KEY_CAMERA_CAPTURE_FORCE, true)
     }
 
     private val frontCameraEnable: Boolean by lazy {
-        intent?.extras?.getBoolean(EvolveImagePicker.KEY_FRONT_CAMERA) == true
+        intent.getBooleanExtra(EvolveImagePicker.KEY_FRONT_CAMERA, false)
     }
 
     private val imgFileName: String by lazy {
-        intent?.extras?.getString(EvolveImagePicker.KEY_FILENAME, "") ?: ""
+        intent.getStringExtra(EvolveImagePicker.KEY_FILENAME) ?: ""
     }
 
     private val orientationEventListener by lazy {
