@@ -9,6 +9,7 @@ import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
@@ -133,6 +134,11 @@ class EvolveCameraActivity : AppCompatActivity(),
             e.printStackTrace()
         }
 
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        outState.clear()
     }
 
     override fun onStart() {
@@ -366,7 +372,6 @@ class EvolveCameraActivity : AppCompatActivity(),
 
                         override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                             val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
-                            Log.d(TAG, "Photo capture succeeded: $savedUri")
                             val intent = Intent()
                             intent.data = savedUri
                             setResult(Activity.RESULT_OK, intent)

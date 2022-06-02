@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.net.Uri
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
@@ -41,6 +42,11 @@ class MainActivity : AppCompatActivity() {
                     forceImageCapture = true
                 )
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        outState.clear()
     }
 
     private fun showImage(uri: Uri) {
