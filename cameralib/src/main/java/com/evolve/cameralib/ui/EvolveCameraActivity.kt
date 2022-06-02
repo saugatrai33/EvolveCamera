@@ -371,14 +371,12 @@ class EvolveCameraActivity : AppCompatActivity(),
                         }
 
                         override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                            val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
                             val intent = Intent()
-                            intent.data = savedUri
+                            intent.putExtra("imagePath", photoFile.absolutePath)
                             setResult(Activity.RESULT_OK, intent)
                             finish()
                         }
                     })
-
             }
         }
 
